@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS flights;
+DROP TABLE IF EXISTS airports;
 create table flights (
 	year int,
 	month int,
@@ -22,7 +24,7 @@ create table flights (
 	taxiOut int,
 	cancelled int,
 	cancellationCode string,
-	diverted int, 
+	diverted int,
     carrierDelay int,
 	weatherDelay int,
     nasDelay int,
@@ -46,7 +48,7 @@ create table airports (
 row format delimited fields terminated by ','
 stored as textfile;
 
-LOAD DATA LOCAL INPATH ' /user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv' into table airports;
+LOAD DATA LOCAL INPATH '/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv' into table airports;
 
 add jar Rank.jar;
 create temporary function rank as 'com.example.hive.udf.Rank';
@@ -54,4 +56,4 @@ create temporary function rank as 'com.example.hive.udf.Rank';
 create table tmp_table (year int, name string, suma double);
 insert overwrite table tmp_table select year, name, sum(depDelay) suma from flights join airports where originIATA = IATA group by year, name sort by year, suma desc;
 
-select * from (select year, rank(year) ranking, name, suma from tmp_table) a where ranking < 5;
+select * from (select year, rank(year) ranking, name, suma from tmp_table) a where ranking <= 5;
