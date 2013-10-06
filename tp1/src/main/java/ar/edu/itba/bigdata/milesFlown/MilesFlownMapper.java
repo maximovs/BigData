@@ -31,14 +31,23 @@ public class MilesFlownMapper extends Mapper<LongWritable, Text, Text, IntWritab
 		String carrierName = carriers.get(carrierCode);
 		
 		if (carrierName != null) {
-			
-			Integer distance = Integer.parseInt(flightInfo[DISTANCE_INDEX]);
-			String year = flightInfo[YEAR_INDEX];
-			if (distance > 0) {
-				context.write(new Text(carrierName + "-" + year), new IntWritable(distance));
+			try {
+				Integer distance = Integer.parseInt(flightInfo[DISTANCE_INDEX]);
+				String year = flightInfo[YEAR_INDEX];
+				if (distance > 0) {
+					context.write(new Text(carrierName + "-" + year), new IntWritable(distance));
+				}
+			} catch (NumberFormatException e) {
+				
+				if (value.toString().equals("NA")) {
+					// NA == NULL, can happen	
+				} else {
+					logger.log(Level.ERROR, "NumberFormatException caused by" + flightInfo[DISTANCE_INDEX] + "(not NA).");
+				}
 			}
+			
 		} else {
-			logger.log(Level.WARN, carrierCode + "wasn't found in input file carriers.csv.");
+			logger.log(Level.WARN, carrierCode + " wasn't found in input file carriers.csv.");
 		}
 	}
 	

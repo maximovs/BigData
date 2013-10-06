@@ -30,7 +30,7 @@ public class CLIParser {
 	private static final String MILES_FLOWN = "milesFlown";
 	private static final String FLIGHT_HOURS_MANUFACTURER = "flightHours";
 	private static final String TARGET_MANUFACTURER = "manufacturer";
-	private static final String CARRIERS_PATH = "/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/carriers.csv";
+	private static final String CARRIERS_PATH = "carriersPath";
 
 	private static Options getInputOptions() {
         final Options opts = new Options();
@@ -55,7 +55,6 @@ public class CLIParser {
 
         final Option milesFlown = OptionBuilder.withLongOpt(MILES_FLOWN)
 								                .withDescription("Calculate the number of miles flown for each airline and year.")
-								                .hasArg()
 								                .create(MILES_FLOWN);
 
         final Option flightHours = OptionBuilder.withLongOpt(FLIGHT_HOURS_MANUFACTURER)
@@ -66,7 +65,11 @@ public class CLIParser {
 											.withDescription("The target manufacturer.")
 											.hasArg()
 											.create(TARGET_MANUFACTURER);
-        
+
+		final Option carriersPath = OptionBuilder.withLongOpt(CARRIERS_PATH)
+												.withDescription("The path to the carriers file/folder.")
+												.hasArg()
+												.create(CARRIERS_PATH);
         
         opts.addOption(inFile);
         opts.addOption(outPath);
@@ -75,6 +78,7 @@ public class CLIParser {
         opts.addOption(milesFlown);
         opts.addOption(flightHours);
         opts.addOption(manufacturer);
+        opts.addOption(carriersPath);
         return opts;
     }
 
@@ -96,20 +100,22 @@ public class CLIParser {
             	config.setMapper(AVGTakeOffDelayMapper.class);
             	config.setReducer(AVGTakeOffDelayReducer.class);
             	
-            } else if(line.hasOption(CANCELLED_FLIGHTS)) {
+            } else if(line.hasOption(CANCELLED_FLIGHTS) && line.hasOption(CARRIERS_PATH)) {
             	config.setMapper(CancelledFlightsMapper.class);
             	config.setReducer(CancelledFlightsReducer.class);
-            	config.setExtra("carriersPath", CARRIERS_PATH);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
             	
-            } else if(line.hasOption(MILES_FLOWN)) {
+            } else if(line.hasOption(MILES_FLOWN) && line.hasOption(CARRIERS_PATH)) {
             	config.setMapper(MilesFlownMapper.class);
             	config.setReducer(MilesFlownReducer.class);
-            	config.setExtra("carriersPath", CARRIERS_PATH);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
             	
-            } else if(line.hasOption(FLIGHT_HOURS_MANUFACTURER)) {
+            } else if(line.hasOption(FLIGHT_HOURS_MANUFACTURER) && line.hasOption(TARGET_MANUFACTURER)) {
             	config.setMapper(FlightHoursByManufacturerMapper.class);
             	config.setReducer(FlightHoursByManufacturerReducer.class);
             	config.setExtra("manufacturer", line.getOptionValue(TARGET_MANUFACTURER));
+            } else {
+            	return null;
             }
             
             return config;

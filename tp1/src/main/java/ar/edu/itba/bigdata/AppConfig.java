@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -71,7 +72,7 @@ public class AppConfig {
 		} else if(mapper.equals(MilesFlownMapper.class)) {
 			return IntWritable.class;
 		} else if(mapper.equals(FlightHoursByManufacturerMapper.class)) {
-			return IntWritable.class;
+			return DoubleWritable.class;
 		}
 		
 		return Text.class;
@@ -87,9 +88,9 @@ public class AppConfig {
 			return DoubleWritable.class;
 		} else if(mapper.equals(CancelledFlightsMapper.class)) {
 			return IntWritable.class;
-		} else if(mapper.equals(CancelledFlightsMapper.class)) {
-			return IntWritable.class;
-		} else if(mapper.equals(CancelledFlightsMapper.class)) {
+		} else if(mapper.equals(MilesFlownMapper.class)) {
+			return LongWritable.class;
+		} else if(mapper.equals(FlightHoursByManufacturerMapper.class)) {
 			return DoubleWritable.class;
 		}
 		
