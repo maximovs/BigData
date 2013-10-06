@@ -19,6 +19,10 @@ import ar.edu.itba.bigdata.flightHoursByManufacturer.FlightHoursByManufacturerMa
 import ar.edu.itba.bigdata.flightHoursByManufacturer.FlightHoursByManufacturerReducer;
 import ar.edu.itba.bigdata.milesFlown.MilesFlownMapper;
 import ar.edu.itba.bigdata.milesFlown.MilesFlownReducer;
+import ar.edu.itba.bigdata.optional.flightCount.FlightCountMapper;
+import ar.edu.itba.bigdata.optional.flightCount.FlightCountReducer;
+import ar.edu.itba.bigdata.optional.proportionalCancelledFlights.ProportionalCancelledFlightsMapper;
+import ar.edu.itba.bigdata.optional.proportionalCancelledFlights.ProportionalCancelledFlightsReducer;
 
 @SuppressWarnings("all")
 public class CLIParser {
@@ -31,6 +35,8 @@ public class CLIParser {
 	private static final String FLIGHT_HOURS_MANUFACTURER = "flightHours";
 	private static final String TARGET_MANUFACTURER = "manufacturer";
 	private static final String CARRIERS_PATH = "carriersPath";
+	private static final String FLIGHT_COUNT = "flightCount";
+	private static final String PROPORCIONAL_CANCELLED_FLIGHTS = "propCancelledFlights";
 
 	private static Options getInputOptions() {
         final Options opts = new Options();
@@ -70,6 +76,15 @@ public class CLIParser {
 												.withDescription("The path to the carriers file/folder.")
 												.hasArg()
 												.create(CARRIERS_PATH);
+
+		final Option flightCount = OptionBuilder.withLongOpt(FLIGHT_COUNT)
+				.withDescription("Count the total amount of flights of each airline.")
+				.create(FLIGHT_COUNT);
+		
+		final Option proportionalCancelledFlights = OptionBuilder.withLongOpt(PROPORCIONAL_CANCELLED_FLIGHTS)
+				.withDescription("Count the total amount of flights of each airline.")
+				.create(PROPORCIONAL_CANCELLED_FLIGHTS);
+		
         
         opts.addOption(inFile);
         opts.addOption(outPath);
@@ -79,6 +94,8 @@ public class CLIParser {
         opts.addOption(flightHours);
         opts.addOption(manufacturer);
         opts.addOption(carriersPath);
+        opts.addOption(flightCount);
+        opts.addOption(proportionalCancelledFlights);
         return opts;
     }
 
@@ -114,6 +131,14 @@ public class CLIParser {
             	config.setMapper(FlightHoursByManufacturerMapper.class);
             	config.setReducer(FlightHoursByManufacturerReducer.class);
             	config.setExtra("manufacturer", line.getOptionValue(TARGET_MANUFACTURER));
+            } else if(line.hasOption(FLIGHT_COUNT) && line.hasOption(CARRIERS_PATH)) {
+            	config.setMapper(FlightCountMapper.class);
+            	config.setReducer(FlightCountReducer.class);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
+            } else if(line.hasOption(PROPORCIONAL_CANCELLED_FLIGHTS) && line.hasOption(CARRIERS_PATH)) {
+            	config.setMapper(ProportionalCancelledFlightsMapper.class);
+            	config.setReducer(ProportionalCancelledFlightsReducer.class);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
             } else {
             	return null;
             }
