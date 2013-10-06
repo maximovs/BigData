@@ -82,7 +82,7 @@ public class CLIParser {
 				.create(FLIGHT_COUNT);
 		
 		final Option proportionalCancelledFlights = OptionBuilder.withLongOpt(PROPORCIONAL_CANCELLED_FLIGHTS)
-				.withDescription("Count the total amount of flights of each airline.")
+				.withDescription("Calculate de proportional amount of cancelled flights over total amount of flights for each airline.")
 				.create(PROPORCIONAL_CANCELLED_FLIGHTS);
 		
         
