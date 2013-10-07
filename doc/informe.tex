@@ -143,39 +143,17 @@ o la proporción de vuelos cancelados.
         \scriptsize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' output='output\_path'}
 
     \subsection{Pig}
-        Cosas que tuvimos en cuenta en los ejercicios de PIG:
-Al correr Pig en forma map-reduce con hadoop pseudo distribuido, tuvimos problemas en un momento ya que hadoop recordaba la IP externa de la computadora y, por lo tanto, no encontraba el reducer.
-
-En todos los ejercicios consideramos que se corren desde una carpeta dentro de la carpeta de pig, por ejemplo, pig/grupo2.
-
-Para ejecutarlo se debe correr:
-pig -param pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param airports=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej9 ej9.pig
-
-Intentamos parametrizar las cosas inicialmente pero no logramos hacer que funcione y además nos dimos cuenta de que no era necesario.
-
-Ejercicio 9: Se cuentan tanto los vuelos cancelados como los que salieron porque la ruta, a nuestro entender, no depende de si sale o no el vuelo sino, de los vuelos programados para salir.
-
-Para ejecutarlo se debe correr:
-pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param airports=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej9 ej9.pig
-
-Ejercicio 10: Tuvimos algunos inconvenientes para hacer el join ya que en algunos casos no había vuelos cancelados y en otro no había vuelos que hayan despegado, por lo tanto, quedaban campos en null. Se solucionó haciendo un FULL OUTER JOIN y chequeando que los campos fueran null y reemplazando esos valores por 0. También se tomaban los valores de las fechas que no fueran null.
-
-Para ejecutarlo se debe correr:
-pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej10 ej10.pig
-
-Ejercicio 11: Para que la hora figure con los ‘:’ en el medio lo separamos en dos int, uno para horas y otro para minutos, el único problema de esto es que las ‘6:02’ las representamos como ‘6:2’ pero no consideramos que sea un detalle importante.
-En el caso de que un aeropuerto no tenga despegues, se ve el nombre del aeropuerto y se deja vacío el campo de la hora.
-
-Para ejecutarlo se debe correr:
-pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej10 ej11.pig
-Ejercicio 12:
-No tomamos en cuenta los casos en que el despegue real ocurra antes que el programado ya que la “demora” en este caso sería negativa y no tendría sentido. Además, siempre que el vuelo salga a la hora esperada o antes, se puede decir que no hay demora, es decir, la demora es 0.
-
-Para ejecutarlo se debe correr:
-pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej10 ej12.pig
-
-
-
+        \subsubsection{Métrica 9 - Rutas más voladas por año}
+            \scriptsize{pig -param flights=FLIGHTS\_PATH -param airports=AIRPORTS\_PATH -param output=OUTPUT\_PATH ej9.pig}
+        \subsubsection{Métrica 10 - Cantidad de vuelos cancelados y no cancelados en septiembre de 2011}
+            \scriptsize{pig -param flights=FLIGHTS\_PATH -param output=OUTPUT\_PATH ej10.pig}
+        \subsubsection{Métrica 11 - Hora partida del último vuelo del 9/11 para cada aeropuerto}
+            \scriptsize{pig -param flights=FLIGHTS\_PATH -param output=OUTPUT\_PATH ej11.pig}
+        \subsubsection{Métrica 12 - Hora partida del último vuelo del 9/11 para cada aeropuerto}
+            \scriptsize{pig -param flights=FLIGHTS\_PATH -param output=OUTPUT\_PATH ej11.pig}
+        \subsubsection{Métrica 13 - Promedio diario de demora de despegue en el año 2001 }
+            \scriptsize{pig -param flights=FLIGHTS\_PATH -param output=OUTPUT\_PATH ej12.pig}
+       
 \section{Formato de los resultados de las métricas}
 
     \subsection{Map Reduce}
@@ -225,54 +203,6 @@ pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/
                 N997AT  191.93333333333334\\
             \end{center}
 
- \subsubsection{Métrica 9 - Las rutas más voladas}
-            Los resultados de esta métrica tienen el siguiente formato:\\
-            \begin{center}
-                Año Origen Destino CANTIDAD\_VUELOS
-            \end{center}
-            Se ordenan por año y, dentro de cada año, por cantidad de vuelos. Sólo se toman en cuenta los primeros diez de cada año
-
-            Un ejemplo sería\\
-            \begin{center}
-                2000  Warsaw Municipal  Salem Memorial  123456\\
-            \end{center}
-
- \subsubsection{Métrica 10 - Cantidad de vuelos diarios (cancelados y no cancelados) durante todo el mes de septiembre de 2001}
-            Los resultados de esta métrica tienen el siguiente formato:\\
-            \begin{center}
-                FECHA CANTIDAD\_VUELOS  CANTIDAD\_CANCELADOS
-            \end{center}
-            Cabe destacar que no se tiene en cuenta los casos de los vuelos reprogramados, es decir, un vuelo cancelado que se efectúa otro día en el mismo mes, suma a ambos.
-
-            Un ejemplo sería\\
-            \begin{center}
-                29/9/2001  112  14\\
-            \end{center}
-
- \subsubsection{Métrica 11 - Horas del último vuelo por aeropuerto el 9/11}
-            Los resultados de esta métrica tienen el siguiente formato:\\
-            \begin{center}
-                ORIGEN HORARIO
-            \end{center}
-            Cabe destacar que las horas se muestran en el formato h:m pero no se agrega un 0 adelante de los minutos si son menores a 10, es decir, las seis y cinco de la tarde se representan de la siguiente manera: 6:5. Otro comentario sería que se listan todos los aeropuertos, incluso en los que no se realizó ningún vuelo, estos se indican dejando la hora en blanco.
-
-            Un ejemplo sería\\
-            \begin{center}
-                SYR  8:46\\
-            \end{center}
-
- \subsubsection{Métrica 12 - promedio diario de horas de demora de despegue en 2001}
-            Los resultados de esta métrica tienen el siguiente formato:\\
-            \begin{center}
-                Año-MES-DÍA PROMEDIO
-            \end{center}
-            Cabe destacar que la cantidad de horas se encuentra en decimal ya que no se efectuaron redondeos.
-
-            Un ejemplo sería\\
-            \begin{center}
-                2001-12-31  0.298048048048048\\
-            \end{center}
-
         \subsubsection{Métrica 13(OPCIONAL) - Cantidad de vuelos por aerolínea}
             Los resultados de esta métrica tienen el siguiente formato:\\
             \begin{center}
@@ -299,6 +229,54 @@ pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/
         %TODO
 
     \subsection{Pig}
-        %TODO
+       \subsubsection{Métrica 9 - Las rutas más voladas}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AÑO ORIGEN DESTINO CANTIDAD\_VUELOS
+            \end{center}
+            Se ordenan por año y, dentro de cada año, por cantidad de vuelos. Sólo se toman en cuenta los primeros diez de cada año.
+
+            Un ejemplo sería\\
+            \begin{center}
+                2000  Warsaw Municipal  Salem Memorial  123456\\
+            \end{center}
+
+       \subsubsection{Métrica 10 - Cantidad de vuelos cancelados y no cancelados en septiembre de 2011}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                FECHA CANTIDAD\_VUELOS  CANTIDAD\_CANCELADOS
+            \end{center}
+            Cabe destacar que no se tiene en cuenta los casos de los vuelos reprogramados, es decir, un vuelo cancelado que se efectúa otro día en el mismo mes, suma a ambos.
+
+            Un ejemplo sería\\
+            \begin{center}
+                29/9/2001  112  14\\
+            \end{center}
+
+       \subsubsection{Métrica 11 - Hora partida del último vuelo del 9/11 para cada aeropuerto}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                ORIGEN HORARIO
+            \end{center}
+            Cabe destacar que las horas se muestran en el formato h:m pero no se agrega un 0 adelante de los minutos si son menores a 10, es decir, 
+            las seis y cinco de la tarde se representan de la siguiente manera: 6:5. Otro comentario sería que se listan todos los aeropuertos, incluso 
+            en los que no se realizó ningún vuelo, estos se indican dejando la hora en blanco.
+
+            Un ejemplo sería\\
+            \begin{center}
+                SYR  8:46\\
+            \end{center}
+
+        \subsubsection{Métrica 12 - Promedio diario de demora de despegue en el año 2001}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AÑO-MES-DIA PROMEDIO
+            \end{center}
+            Cabe destacar que la cantidad de horas se encuentra en decimal ya que no se efectuaron redondeos.
+
+            Un ejemplo sería\\
+            \begin{center}
+                2001-12-31  0.298048048048048\\
+            \end{center}
 
 \end{document}
