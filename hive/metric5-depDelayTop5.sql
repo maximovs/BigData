@@ -56,4 +56,4 @@ create temporary function rank as 'com.example.hive.udf.Rank';
 create table tmp_table (year int, name string, suma double);
 insert overwrite table tmp_table select year, name, sum(depDelay) suma from flights join airports where originIATA = IATA group by year, name sort by year, suma desc;
 
-select * from (select year, rank(year) ranking, name, suma from tmp_table) a where ranking <= 5;
+INSERT OVERWRITE DIRECTORY '${hiveconf:output}' select * from (select year, rank(year) ranking, name, suma from tmp_table) a where ranking <= 5;

@@ -151,4 +151,4 @@ INNER JOIN tmp_table_delayed_dep deldep ON deldep.IATA = delarr.IATA
 INNER JOIN tmp_table_all_dep alldep ON alldep.IATA = delarr.IATA
 ORDER BY average DESC;
 
-select * from (select name, position(average) position, average from tmp_results) a where position <= 5;
+INSERT OVERWRITE DIRECTORY '${hiveconf:output}' select * from (select name, position(average) position, average from tmp_results) a where position <= 5;

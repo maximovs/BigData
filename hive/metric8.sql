@@ -75,7 +75,7 @@ AND
 )
 group by year, month, dayOfMonth;
 
-SELECT * FROM (
+INSERT OVERWRITE DIRECTORY '${hiveconf:output}' SELECT * FROM (
 
     SELECT "Katrina", concat(year,"-", padInt(month), "-", padInt(dayOfMonth)), cantidad FROM tmp_table_katrina ORDER BY cantidad DESC LIMIT 1
 

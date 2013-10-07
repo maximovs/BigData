@@ -47,7 +47,7 @@ create temporary function cancelByWeather as 'com.example.hive.udf.CancelByWeath
 add jar CheckVariable.jar;
 create temporary function checkVariable as 'com.example.hive.udf.CheckVariable';
 
-select tmp_table.fc, count(tmp_table.totalDelay > 0), sum(tmp_table.totalDelay), sum(tmp_table.cancelled), sum(diverted), sum(weatherCancels) from (
+INSERT OVERWRITE DIRECTORY '${hiveconf:output}' select tmp_table.fc, count(tmp_table.totalDelay > 0), sum(tmp_table.totalDelay), sum(tmp_table.cancelled), sum(diverted), sum(weatherCancels) from (
 	select concat(yearNum,"-", padInt(monthNum), "-", padInt(dayOfMonth)) fc, nonNegatives(depDelay + arrDelay) totalDelay, cancelled, diverted, cancelByWeather(cancellationCode) weatherCancels, (depDelay + arrDelay > 0) wasDelayed from flights
     WHERE
     (
