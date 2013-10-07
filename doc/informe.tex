@@ -102,6 +102,10 @@ en los archivos \textit{airports.csv} y \textit{carriers.csv}, todos los campos 
 previo a hacer los joins tuvimos que efectuar algunas moficiaciones en los datos, obviamente sin modificar los archivos del HDFS. Simplemente es eliminaron las comillas dobles
 previo a la utilización de los datos de estos archivos.\\
 
+Respecto a Hive, encontramos ciertos problemas al parametrizar los \textit{scripts}. Esto trajo particulares complicaciones al implementar la métrica 6, ya que en dicha métrica es posible recibir o no un parametro. En nuestros \textit{scripts} explotamos el hecho de que Hive permite el uso de variables del sistema mediante la linea de comandos (con el uso de -hiveconf). Una vez establecidas estas variables, Hive reemplaza las apariciones de estas variables por su valor real de forma similar a como funciona una macro. Sin embargo, en caso de no existir alguna variable, Hive las toma como texto plano. Para poder manejar estas situaciones, creamos una UDF que trata de discriminar si la variable existe, abusando del conocimiento que toda variable no existente contenera \"hiveconf\" en su texto.
+
+Hubo un segundo problema con Hive, a la hora de imprimir las salidas a archivos. La separación de los campos y las tuplas no son cómodos a la hora de leerlos, haciendo las salidas poco legibles. Esto podría solucionarse rápidamente con un \textit{script} de \textit{Bash} o ejecutando busquedas y reemplazos en editores con esta capacidad (como por ejemplo, \textit{vim}).
+
 \section{Decisiones de implementación}
 
 Para las métricas implementadas con MapReduce en Java, decidimos implementar, en todos los casos, \textit{Broadcast Join} al hacer joins por 2 razones principales: en todos los casos,
@@ -123,21 +127,20 @@ o la proporción de vuelos cancelados.
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -milesFlown -carriersPath 'carriers\_path'}
         \subsubsection{Métrica 4 - Horas de vuelo por fabricante}
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -flightHours -manufacturer 'target\_manufacturer\_name'}
-        \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
-        \scriptsize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' > 'output\_path'}
-        \subsubsection{Métrica 6 - Imprevistos 2005}
-        \scriptsize{hive -S -f metric6-2005FlightStats.sql -hiveconf flightsPath='input\_flights\_path' [airport='airport\_IATA'] > 'output\_path'}
-        \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
-        \scriptsize{hive -S -f metric7.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' > 'output\_path'}
-        \subsubsection{Métrica 8 - Huracanes con más cancelacioens}
-        \scriptsize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' > 'output\_path'}
-        \subsubsection{Métrica 13(OPCIONAL) - Cantidad de vuelos por aerolínea}
+       \subsubsection{Métrica 13(OPCIONAL) - Cantidad de vuelos por aerolínea}
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -flightCount -carriersPath 'carriers\_path'}
         \subsubsection{Métrica 14(OPCIONAL) - Proporción de vuelos cancelados por aerolínea}
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -propCancelledFLights -carriersPath 'carriers\_path'}
 
     \subsection{Hive}
-        %TODO
+         \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
+        \scriptsize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' output='output\_path'}
+        \subsubsection{Métrica 6 - Imprevistos 2005}
+        \scriptsize{hive -S -f metric6-2005FlightStats.sql -hiveconf flightsPath='input\_flights\_path' [airport='airport\_IATA'] output='output\_path'}
+        \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
+        \scriptsize{hive -S -f metric7.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' output='output\_path'}
+        \subsubsection{Métrica 8 - Huracanes con más cancelacioens}
+        \scriptsize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' output='output\_path'}
 
     \subsection{Pig}
         Cosas que tuvimos en cuenta en los ejercicios de PIG:
@@ -145,30 +148,30 @@ Al correr Pig en forma map-reduce con hadoop pseudo distribuido, tuvimos problem
 
 En todos los ejercicios consideramos que se corren desde una carpeta dentro de la carpeta de pig, por ejemplo, pig/grupo2.
 
-Para ejecutarlo se debe correr: 
+Para ejecutarlo se debe correr:
 pig -param pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param airports=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej9 ej9.pig
 
 Intentamos parametrizar las cosas inicialmente pero no logramos hacer que funcione y además nos dimos cuenta de que no era necesario.
 
-Ejercicio 9: Se cuentan tanto los vuelos cancelados como los que salieron porque la ruta, a nuestro entender, no depende de si sale o no el vuelo sino, de los vuelos programados para salir. 
+Ejercicio 9: Se cuentan tanto los vuelos cancelados como los que salieron porque la ruta, a nuestro entender, no depende de si sale o no el vuelo sino, de los vuelos programados para salir.
 
-Para ejecutarlo se debe correr: 
+Para ejecutarlo se debe correr:
 pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param airports=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej9 ej9.pig
 
 Ejercicio 10: Tuvimos algunos inconvenientes para hacer el join ya que en algunos casos no había vuelos cancelados y en otro no había vuelos que hayan despegado, por lo tanto, quedaban campos en null. Se solucionó haciendo un FULL OUTER JOIN y chequeando que los campos fueran null y reemplazando esos valores por 0. También se tomaban los valores de las fechas que no fueran null.
 
-Para ejecutarlo se debe correr: 
+Para ejecutarlo se debe correr:
 pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej10 ej10.pig
 
 Ejercicio 11: Para que la hora figure con los ‘:’ en el medio lo separamos en dos int, uno para horas y otro para minutos, el único problema de esto es que las ‘6:02’ las representamos como ‘6:2’ pero no consideramos que sea un detalle importante.
 En el caso de que un aeropuerto no tenga despegues, se ve el nombre del aeropuerto y se deja vacío el campo de la hora.
 
-Para ejecutarlo se debe correr: 
+Para ejecutarlo se debe correr:
 pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej10 ej11.pig
 Ejercicio 12:
 No tomamos en cuenta los casos en que el despegue real ocurra antes que el programado ya que la “demora” en este caso sería negativa y no tendría sentido. Además, siempre que el vuelo salga a la hora esperada o antes, se puede decir que no hay demora, es decir, la demora es 0.
 
-Para ejecutarlo se debe correr: 
+Para ejecutarlo se debe correr:
 pig -param flights=/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data/ -param output=/user/hadoop/ITBA/TP1/OUTPUT2/ej10 ej12.pig
 
 
