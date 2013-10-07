@@ -25,11 +25,11 @@
 \setcounter{tocdepth}{5}
 
 \renewcommand{\lstlistingname}{C\'odigo Fuente}
-\lstloadlanguages{Octave} 
+\lstloadlanguages{Octave}
 \lstdefinelanguage{MyOctave}[]{Octave}{
         deletekeywords={beta,det},
         morekeywords={repmat}
-} 
+}
 \lstset{
         language=MyOctave,
         stringstyle=\ttfamily,
@@ -39,17 +39,17 @@
         keywordstyle=\bfseries,
         numbers=left,
         numberstyle=\ttfamily\footnotesize,
-        stepnumber=1,                   
+        stepnumber=1,
         framexleftmargin=0.20cm,
-        numbersep=0.37cm,              
+        numbersep=0.37cm,
         backgroundcolor=\color{white},
         showspaces=false,
         showtabs=false,
         frame=l,
         tabsize=4,
-        captionpos=b,               
-        breaklines=true,             
-        breakatwhitespace=false,      
+        captionpos=b,
+        breaklines=true,
+        breakatwhitespace=false,
         mathescape=true
 }
 
@@ -72,7 +72,7 @@
                 Crespo, Alvaro && 50758 \\
                 Petit, Alejandro && XXXXX \\
                 Susnisky, Dario && 50592 \\
-                Videla, Máximo && 51071\\                
+                Videla, Máximo && 51071\\
         \end{tabular}
 }
         \vspace{2cm}
@@ -91,15 +91,15 @@
 Al correr inicialmente los jobs de map-reduce que utilizaban tablas de HBase, tuvimos errores por no setear correctamente la configuración de Zookeeper. Estos errores
 pudieron solucionarse configurando correctamente las propiedades $HBASE_CONFIGURATION_ZOOKEEPER_QUORUM$ y $HBASE_CONFIGURATION_ZOOKEEPER_CLIENTPORT$.\\
 
-Al momento de implementar joins con los archivos CSV, nos encontramos con el problema de como hacer que los archivos estén disponibles en cada mapper. La clase 
+Al momento de implementar joins con los archivos CSV, nos encontramos con el problema de como hacer que los archivos estén disponibles en cada mapper. La clase
 \textit{Distributed Cache} nos sirvió para justamente sobrepasar esta dificultad.\\
 
-Al correr Pig en forma map-reduce con hadoop pseudo-distribuido, tuvimos problemas en un momento ya que hadoop recordaba la IP externa de la computadora y, 
+Al correr Pig en forma map-reduce con hadoop pseudo-distribuido, tuvimos problemas en un momento ya que hadoop recordaba la IP externa de la computadora y,
 por lo tanto, no encontraba el reducer.\\
 
 En varios momentos, tanto al implementar las métricas con MapReduce en Java y con Hive, nos encontramos con irritantes errores de formato en algunos archivos CSV. En particular,
-en los archivos \textit{airports.csv} y \textit{carriers.csv}, todos los campos estabán entre comillas dobles (``) y esto producía algunos errores al hacer joins. Es por esto que 
-previo a hacer los joins tuvimos que efectuar algunas moficiaciones en los datos, obviamente sin modificar los archivos del HDFS. Simplemente es eliminaron las comillas dobles 
+en los archivos \textit{airports.csv} y \textit{carriers.csv}, todos los campos estabán entre comillas dobles (``) y esto producía algunos errores al hacer joins. Es por esto que
+previo a hacer los joins tuvimos que efectuar algunas moficiaciones en los datos, obviamente sin modificar los archivos del HDFS. Simplemente es eliminaron las comillas dobles
 previo a la utilización de los datos de estos archivos.\\
 
 \section{Decisiones de implementación}
@@ -108,7 +108,7 @@ Para las métricas implementadas con MapReduce en Java, decidimos implementar, e
 uno de los \textit{dataset} siempre se podía asumir pequeño (3000 aeropuertos, 1500 aerolíneas y 5000 aviones), y además es la opción más fácil de implementar (en algunos casos se
 utilizaban tablas de \textit{HBase} y en otros se aprovechaba el \textit{Distributed Cache} de Hadoop para distribuir los archivos CSV).\\
 
-Decidimos implementar 2 simples métricas extra, como son la cantidad de vuelos totales de cada aerolínea, y la proporción de vuelos cancelados sobre el total de vuelos para cada 
+Decidimos implementar 2 simples métricas extra, como son la cantidad de vuelos totales de cada aerolínea, y la proporción de vuelos cancelados sobre el total de vuelos para cada
 aerolínea. Otras métricas interesantes hubieran sido agregarle a estas métricas extra la posibilidad de discriminar por año además de por aerolínea, ya sea la cantidad de vuelos
 o la proporción de vuelos cancelados.
 
@@ -123,6 +123,14 @@ o la proporción de vuelos cancelados.
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -milesFlown -carriersPath 'carriers\_path'}
         \subsubsection{Métrica 4 - Horas de vuelo por fabricante}
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -flightHours -manufacturer 'target\_manufacturer\_name'}
+        \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
+        \scriptsize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' > 'output\_path'}
+        \subsubsection{Métrica 6 - Imprevistos 2005}
+        \scriptsize{hive -S -f metric6-2005FlightStats.sql -hiveconf flightsPath='input\_flights\_path' [airport='airport\_IATA'] > 'output\_path'}
+        \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
+        \scriptsize{hive -S -f metric7.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' > 'output\_path'}
+        \subsubsection{Métrica 8 - Huracanes con más cancelacioens}
+        \scriptsize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' > 'output\_path'}
         \subsubsection{Métrica 13(OPCIONAL) - Cantidad de vuelos por aerolínea}
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -flightCount -carriersPath 'carriers\_path'}
         \subsubsection{Métrica 14(OPCIONAL) - Proporción de vuelos cancelados por aerolínea}
