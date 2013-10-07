@@ -97,6 +97,9 @@ Al momento de implementar joins con los archivos CSV, nos encontramos con el pro
 Al correr Pig en forma map-reduce con hadoop pseudo-distribuido, tuvimos problemas en un momento ya que hadoop recordaba la IP externa de la computadora y,
 por lo tanto, no encontraba el reducer.\\
 
+En la métrica 10 de Pig, tuvimos algunos inconvenientes para hacer el join ya que, en algunos casos, no había vuelos cancelados y, en otros, no había vuelos que hayan despegado, por lo tanto, quedaban campos en null. Se solucionó haciendo un FULL OUTER JOIN y chequeando que los campos fueran null y reemplazando esos valores por 0. También se tomaban los valores de las fechas que no fueran null.\\
+
+
 En varios momentos, tanto al implementar las métricas con MapReduce en Java y con Hive, nos encontramos con irritantes errores de formato en algunos archivos CSV. En particular,
 en los archivos \textit{airports.csv} y \textit{carriers.csv}, todos los campos estabán entre comillas dobles (``) y esto producía algunos errores al hacer joins. Es por esto que
 previo a hacer los joins tuvimos que efectuar algunas moficiaciones en los datos, obviamente sin modificar los archivos del HDFS. Simplemente es eliminaron las comillas dobles
@@ -114,7 +117,18 @@ utilizaban tablas de \textit{HBase} y en otros se aprovechaba el \textit{Distrib
 
 Decidimos implementar 2 simples métricas extra, como son la cantidad de vuelos totales de cada aerolínea, y la proporción de vuelos cancelados sobre el total de vuelos para cada
 aerolínea. Otras métricas interesantes hubieran sido agregarle a estas métricas extra la posibilidad de discriminar por año además de por aerolínea, ya sea la cantidad de vuelos
-o la proporción de vuelos cancelados.
+o la proporción de vuelos cancelados.\\
+
+En el caso de las métricas de \textit{Pig} tomamos las siguientes decisiones a la hora de implementarlas:\\
+
+En la métrica 9, se cuentan tanto los vuelos cancelados como los que salieron porque la ruta, a nuestro entender, no depende de si sale o no el vuelo sino, de los vuelos programados para salir. \\
+
+En la métrica 11, para que la hora figure con los ‘:’ en el medio lo separamos en dos int, uno para horas y otro para minutos, el único problema de esto es que las ‘6:02’ las representamos como ‘6:2’ pero no consideramos que sea un detalle importante.
+En el caso de que un aeropuerto no tenga despegues, se ve el nombre del aeropuerto y se deja vacío el campo de la hora, de esta forma, no se pierde la información de que no hubo vuelos ese día.\\
+
+En la métrica 12, no tomamos en cuenta los casos en que el despegue real ocurra antes que el programado, ya que la “demora” en este caso sería negativa y no tendría sentido. Además, siempre que el vuelo salga a la hora esperada o antes, se puede decir que no hay demora, es decir, la demora es 0.
+
+
 
 \section{Instrucciones para ejecutar las métricas}
 
