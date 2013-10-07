@@ -55,6 +55,6 @@ add jar Rank.jar;
 create temporary function rank as 'com.example.hive.udf.Rank';
 
 create table tmp_table (year int, name string, suma double);
-insert overwrite table tmp_table select year, regexp_replace(name, '\"', ''), sum(depDelay) suma from flights join airports where originIATA = regexp_replace(IATA, '\"', '') group by year, name sort by year, suma desc;
+insert overwrite table tmp_table select year, regexp_replace(name, '\"', ''), sum(depDelay) suma from flights join airports where originIATA = regexp_replace(IATA, '\"', '') group by year, regexp_replace(name, '\"', '') sort by year, suma desc;
 
 INSERT OVERWRITE DIRECTORY '${hiveconf:output}' select * from (select year, rank(year) ranking, name, suma from tmp_table) a where ranking <= 5;
