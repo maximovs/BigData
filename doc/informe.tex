@@ -229,15 +229,45 @@ o la proporción de vuelos cancelados.
         El output de Hive se puede ver en un archivo en el directorio especificado al ejecutar el \textit{script}. Como fue mencionado en los problemas encontrados, la separación entre los campos se da por el caracter \"^A\" mientras que las tuplas están separados por \"\\N\"..
         A continuación se detalla el órden de los campos para cada una de las métricas.
         \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
-        Año - Puesto - Aeropuerto - Horas totales de demora
+        Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AÑO - PUESTO - AEROPUERTO - HORAS TOTALES DE DEMORA\\
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+               2000 - 1 - John F Kennedy Intl - 456.23\\
+            \end{center}
         \subsubsection{Métrica 6 - Imprevistos 2005}
-        Fecha - Cantidad de vuelos demorados - Suma de horas de demora - Cantidad de vuelos demorados - Cantidad de vuelos desviados - Cantidad de vuelos cancelados por mal clima
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                FECHA - CANTIDAD DE VUELOS DEMORADOS - SUMA DE HORAS DE DEMORA - CANTIDAD DE VUELOS DEMORADOS - CANTIDAD DE VUELOS DESVIADOS - CANTIDAD DE VUELOS CANCELADOS POR MAL CLIMA\\
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+            25/04/2005 - 123 - 456 - 789 - 58 - 123\\
+            \end{center}
         \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
-        Aeropuerto - Puesto - Promedio de vuelos demorados por día
+        Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AEROPUERTO - PUESTO - PROMEDIO DE VUELOS DEMORADOS POR DIA
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+            John F Kennedy Intl - 1 - 89.53\\
+            \end{center}
         \subsubsection{Métrica 8 - Huracanes con más cancelaciones}
-        Huracan - Fecha - Cantidad de vuelos cancelados
+        Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                HURACAN - FECHA - CANTIDAD DE VUELOS CANCELADOS
+            \end{center}
 
-
+            Un ejemplo sería\\
+            \begin{center}
+            KATRINA - 25/04/2005 - 123\\
+            \end{center}
 
 
     \subsection{Pig}
