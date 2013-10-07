@@ -36,7 +36,7 @@ create table flights (
 row format delimited fields terminated by ','
 stored as textfile;
 
-LOAD DATA LOCAL INPATH '${hiveconf:flightsPath}' into table flights;
+LOAD DATA INPATH '${hiveconf:flightsPath}' into table flights;
 
 --add jar Rank.jar;
 --create temporary function rank as 'com.example.hive.udf.Rank';

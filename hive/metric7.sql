@@ -34,7 +34,7 @@ create table flights (
 row format delimited fields terminated by ','
 stored as textfile;
 
-LOAD DATA LOCAL INPATH '${hiveconf:flightsPath}' into table flights;
+LOAD DATA INPATH '${hiveconf:flightsPath}' into table flights;
 
 create table airports (
 	IATA string,
@@ -48,17 +48,17 @@ create table airports (
 row format delimited fields terminated by ','
 stored as textfile;
 
-LOAD DATA LOCAL INPATH '${hiveconf:airportsPath}' into table airports;
+LOAD DATA INPATH '${hiveconf:airportsPath}' into table airports;
 
 drop table if exists tmp_table_delayed_dep;
 create table tmp_table_delayed_dep(IATA string, name string, quantity int);
 
 insert overwrite table tmp_table_delayed_dep
-select a.IATA,
-a.name,
+select regexp_replace(a.IATA, '\"', ''),
+regexp_replace(a.name, '\"', ''),
 count(*)
 FROM airports a
-INNER JOIN flights dep ON a.IATA = dep.originIATA
+INNER JOIN flights dep ON regexp_replace(a.IATA, '\"', '') = dep.originIATA
 WHERE
 (
     (dep.year = 2005 AND dep.month = 10 AND dep.dayOfMonth >= 15 AND dep.dayOfMonth <= 26)
@@ -70,17 +70,17 @@ WHERE
     (dep.year = 1998 AND dep.month = 11 AND dep.dayOfMonth <= 5)
 )
 AND dep.depDelay > 0
-GROUP BY a.IATA, a.name;
+GROUP BY regexp_replace(a.IATA, '\"', ''), regexp_replace(a.name, '\"', '');
 
 drop table if exists tmp_table_all_dep;
 create table tmp_table_all_dep(IATA string, name string, quantity int);
 
 insert overwrite table tmp_table_all_dep
-select a.IATA,
-a.name,
+select regexp_replace(a.IATA, '\"', ''),
+regexp_replace(a.name, '\"', ''),
 count(*)
 FROM airports a
-INNER JOIN flights dep ON a.IATA = dep.originIATA
+INNER JOIN flights dep ON regexp_replace(a.IATA, '\"', '') = dep.originIATA
 WHERE
 (
     (dep.year = 2005 AND dep.month = 10 AND dep.dayOfMonth >= 15 AND dep.dayOfMonth <= 26)
@@ -91,17 +91,17 @@ WHERE
     OR
     (dep.year = 1998 AND dep.month = 11 AND dep.dayOfMonth <= 5)
 )
-GROUP BY a.IATA, a.name;
+GROUP BY regexp_replace(a.IATA, '\"', ''), regexp_replace(a.name, '\"', '');
 
 drop table if exists tmp_table_delayed_arr;
 create table tmp_table_delayed_arr(IATA string, name string, quantity int);
 
 insert overwrite table tmp_table_delayed_arr
-select a.IATA,
-a.name,
+select regexp_replace(a.IATA, '\"', ''),
+regexp_replace(a.name, '\"', ''),
 count(*)
 FROM airports a
-INNER JOIN flights arr ON a.IATA = arr.originIATA
+INNER JOIN flights arr ON regexp_replace(a.IATA, '\"', '') = arr.originIATA
 WHERE
 (
     (arr.year = 2005 AND arr.month = 10 AND arr.dayOfMonth >= 15 AND arr.dayOfMonth <= 26)
@@ -113,17 +113,17 @@ WHERE
     (arr.year = 1998 AND arr.month = 11 AND arr.dayOfMonth <= 5)
 )
 AND arr.arrDelay > 0
-GROUP BY a.IATA, a.name;
+GROUP BY regexp_replace(a.IATA, '\"', ''), regexp_replace(a.name, '\"', '');
 
 drop table if exists tmp_table_all_arr;
 create table tmp_table_all_arr(IATA string, name string, quantity int);
 
 insert overwrite table tmp_table_all_arr
-select a.IATA,
-a.name,
+select regexp_replace(a.IATA, '\"', ''),
+regexp_replace(a.name, '\"', ''),
 count(*)
 FROM airports a
-INNER JOIN flights arr ON a.IATA = arr.originIATA
+INNER JOIN flights arr ON regexp_replace(a.IATA, '\"', '') = arr.originIATA
 WHERE
 (
     (arr.year = 2005 AND arr.month = 10 AND arr.dayOfMonth >= 15 AND arr.dayOfMonth <= 26)
@@ -134,7 +134,7 @@ WHERE
     OR
     (arr.year = 1998 AND arr.month = 11 AND arr.dayOfMonth <= 5)
 )
-GROUP BY a.IATA, a.name;
+GROUP BY regexp_replace(a.IATA, '\"', ''), regexp_replace(a.name, '\"', '');
 
 
 add jar Position.jar;

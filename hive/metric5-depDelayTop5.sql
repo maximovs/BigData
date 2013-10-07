@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS flights;
 DROP TABLE IF EXISTS airports;
+DROP TABLE IF EXISTS tmp_table;
 create table flights (
 	year int,
 	month int,
@@ -34,7 +35,7 @@ create table flights (
 row format delimited fields terminated by ','
 stored as textfile;
 
-LOAD DATA LOCAL INPATH '${hiveconf:flightsPath}' into table flights;
+LOAD DATA INPATH '${hiveconf:flightsPath}' into table flights;
 
 create table airports (
 	IATA string,
@@ -48,12 +49,12 @@ create table airports (
 row format delimited fields terminated by ','
 stored as textfile;
 
-LOAD DATA LOCAL INPATH '${hiveconf:airportsPath}' into table airports;
+LOAD DATA INPATH '${hiveconf:airportsPath}' into table airports;
 
 add jar Rank.jar;
 create temporary function rank as 'com.example.hive.udf.Rank';
 
 create table tmp_table (year int, name string, suma double);
-insert overwrite table tmp_table select year, name, sum(depDelay) suma from flights join airports where originIATA = IATA group by year, name sort by year, suma desc;
+insert overwrite table tmp_table select year, regexp_replace(name, '\"', ''), sum(depDelay) suma from flights join airports where originIATA = regexp_replace(IATA, '\"', '') group by year, name sort by year, suma desc;
 
 INSERT OVERWRITE DIRECTORY '${hiveconf:output}' select * from (select year, rank(year) ranking, name, suma from tmp_table) a where ranking <= 5;
