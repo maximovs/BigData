@@ -111,7 +111,7 @@ Un segundo problema con Hive, a la hora de imprimir las salidas a archivos. La s
 
 Además, cabe mencionar que la métrica 5, tiene un elevado tiempo de ejecución. Este es un problema de especial interés ya que al ejecutarlo en sistemas locales, esto no se presentaba como un problema y fue evidente al probarlo en el \textit{cluster}. Sería una posible mejora optimizar esta métrica para que su tiempo de ejecución sea menor al actual.
 
-Por último, nos encontramos con un problema al crear y popular las tablas medianto los scripts en Hive. Las formas actuales que utilizan los \textit{scripts} para hacer esto derivan en que los archivos originales que poseen la información se ven borrados. Sería otra posible mejora solucionar este problema.
+Por último, nos encontramos con un problema al crear y popular las tablas medianto los scripts en Hive. Al correr los scripts, los archivos csv originales se veian borrados. Finalmente logramos sortear este problema definiendo tablas externas y modificando la manera en la que son populadas.
 
 \section{Decisiones de implementación}
 
@@ -151,6 +151,7 @@ En la métrica 12, no tomamos en cuenta los casos en que el despegue real ocurra
             \footnotesize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -propCancelledFLights -carriersPath 'carriers\_path'}
 
     \subsection{Hive}
+        Es importante mencionar que para los archivos de entrada, Hive recibe directorios y no archivos puntuales. Por esto, es importante que los directorios únicamente contengan aquellos archivos que deseamos que sean procesados. En el caso de los \textit{script} que reciben información de aeropuertos, airports.csv debe estar en un directorio de manera aislada.
         \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
         \footnotesize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' -hiveconf airportsPath='input\_airports\_path' -hiveconf output='output\_path'}
         \subsubsection{Métrica 6 - Imprevistos 2005}
