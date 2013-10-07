@@ -152,6 +152,7 @@ En la métrica 12, no tomamos en cuenta los casos en que el despegue real ocurra
 
     \subsection{Hive}
         Es importante mencionar que para los archivos de entrada, Hive recibe directorios y no archivos puntuales. Por esto, es importante que los directorios únicamente contengan aquellos archivos que deseamos que sean procesados. En el caso de los \textit{script} que reciben información de aeropuertos, airports.csv debe estar en un directorio de manera aislada.
+        Por último, es importante aclarar que los directorios de los archivos de entrada deben ser \textit{paths} absolutos y no relativos.
         \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
         \footnotesize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' -hiveconf airportsPath='input\_airports\_path' -hiveconf output='output\_path'}
         \subsubsection{Métrica 6 - Imprevistos 2005}
