@@ -1,7 +1,8 @@
 REGISTER ../contrib/piggybank/java/piggybank.jar;
-flights = LOAD '/user/hadoop/ITBA/TP1/INPUT/SAMPLE/data' USING org.apache.pig.piggybank.storage.CSVLoader() AS (year:chararray, month:chararray ,dayofMonth:chararray,dayOfWeek:chararray, DepTime:chararray, CRSDepTime:chararray, ArrTime:chararray ,CRSArrTime:chararray, UniqueCarrier:chararray, FlightNum:chararray, TailNum:chararray, ActualElapsedTime:chararray, CRSElapsedTime:chararray, AirTime:chararray, ArrDelay:chararray, DepDelay:chararray, Origin:chararray, Dest:chararray, Distance:chararray, TaxiIn:chararray, TaxiOut:chararray, Cancelled:chararray, CancellationCode:chararray, Diverted:chararray, CarrierDelay:chararray, WeatherDelay:chararray, NASDelay:chararray, SecurityDelay:chararray, LateAircraftDelay:chararray);
 
-airports = LOAD '/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/airports.csv'
+flights = LOAD '$flights' USING org.apache.pig.piggybank.storage.CSVLoader() AS (year:chararray, month:chararray ,dayofMonth:chararray,dayOfWeek:chararray, DepTime:chararray, CRSDepTime:chararray, ArrTime:chararray ,CRSArrTime:chararray, UniqueCarrier:chararray, FlightNum:chararray, TailNum:chararray, ActualElapsedTime:chararray, CRSElapsedTime:chararray, AirTime:chararray, ArrDelay:chararray, DepDelay:chararray, Origin:chararray, Dest:chararray, Distance:chararray, TaxiIn:chararray, TaxiOut:chararray, Cancelled:chararray, CancellationCode:chararray, Diverted:chararray, CarrierDelay:chararray, WeatherDelay:chararray, NASDelay:chararray, SecurityDelay:chararray, LateAircraftDelay:chararray);
+
+airports = LOAD '$airports'
            USING org.apache.pig.piggybank.storage.CSVLoader()
            AS (ID:chararray, airport:chararray);
 
@@ -24,4 +25,4 @@ results = FOREACH countedByYear {
 };
 
 
-DUMP results;
+STORE results INTO '$output' USING PigStorage (',');
