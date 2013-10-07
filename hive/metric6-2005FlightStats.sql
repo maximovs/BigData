@@ -1,3 +1,4 @@
+drop table if exists flights;
 create table flights (
 	yearNum int,
 	monthNum int,
