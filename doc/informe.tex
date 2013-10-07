@@ -134,13 +134,13 @@ o la proporción de vuelos cancelados.
 
     \subsection{Hive}
         \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
-        \footnotesize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' output='output\_path'}
+        \footnotesize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' -hiveconf airportsPath='input\_airports\_path' -hiveconf output='output\_path'}
         \subsubsection{Métrica 6 - Imprevistos 2005}
-        \footnotesize{hive -S -f metric6-2005FlightStats.sql -hiveconf flightsPath='input\_flights\_path' [airport='airport\_IATA'] output='output\_path'}
+        \footnotesize{hive -S -f metric6-2005FlightStats.sql -hiveconf flightsPath='input\_flights\_path' [-hiveconf airport='airport\_IATA'] -hiveconf output='output\_path'}
         \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
-        \footnotesize{hive -S -f metric7.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' output='output\_path'}
+        \footnotesize{hive -S -f metric7.sql -hiveconf flightsPath='input\_flights\_path' -hiveconf airportsPath='input\_airports\_path' -hiveconf output='output\_path'}
         \subsubsection{Métrica 8 - Huracanes con más cancelaciones}
-        \footnotesize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' output='output\_path'}
+        \footnotesize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' -hiveconf output='output\_path'}
 
     \subsection{Pig}
         \subsubsection{Métrica 9 - Rutas más voladas por año}
