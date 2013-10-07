@@ -1,4 +1,4 @@
-package ar.edu.itba.bigdata.milesFlown;
+package ar.edu.itba.bigdata.optional.proportionalCancelledFlights;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,12 +16,11 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-public class MilesFlownMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+public class ProportionalCancelledFlightsMapper  extends Mapper<LongWritable, Text, Text, IntWritable>  {
 
-	private static final int DISTANCE_INDEX = 18;
+	private static final int WAS_CANCELLED_INDEX = 21;
 	private static final int CARRIER_CODE_INDEX = 8;
-	private static final int YEAR_INDEX = 0;
-	private HashMap<String, String> carriers = new HashMap<String, String>();;
+	private HashMap<String, String> carriers = new HashMap<String, String>();
 	private Logger logger = Logger.getLogger(this.getClass().getSimpleName() + " Mapper");
 
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -31,37 +30,23 @@ public class MilesFlownMapper extends Mapper<LongWritable, Text, Text, IntWritab
 		String carrierName = carriers.get(carrierCode);
 		
 		if (carrierName != null) {
-
-			try {
-				Integer distance = Integer.parseInt(flightInfo[DISTANCE_INDEX]);
-				String year = flightInfo[YEAR_INDEX];
-				if (distance > 0) {
-					context.write(new Text(carrierName + "-" + year), new IntWritable(distance));
-				}
-			} catch (NumberFormatException e) {
-				
-				if (value.toString().equals("NA")) {
-					// NA == NULL, can happen	
-				} else {
-					logger.log(Level.ERROR, "NumberFormatException caused by" + flightInfo[DISTANCE_INDEX] + "(not NA).");
-				}
-			}
 			
+			Integer cancelled = Integer.parseInt(flightInfo[WAS_CANCELLED_INDEX]);
+			context.write(new Text(carrierName), new IntWritable(cancelled));
 		} else {
-			logger.log(Level.WARN, carrierCode + " wasn't found in input file carriers.csv.");
-
+			logger.log(Level.WARN, carrierCode + "wasn't found in input file carriers.csv.");
 		}
 	}
-	
+
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException {
-		 
+		
 		BufferedReader reader = getBufferedReader(context);
 
 		String line;
 		while ((line = reader.readLine()) != null) {
 			String carrierInfo[] = line.split(",", 2);
-			String code = carrierInfo[0].replace("\"", "");
+			String code = carrierInfo[0].replace("\"", "");;
 			String name = carrierInfo[1].replace("\"", "");
 			carriers.put(code, name);
 		}
@@ -84,6 +69,4 @@ public class MilesFlownMapper extends Mapper<LongWritable, Text, Text, IntWritab
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		return reader;
 	}
-	
-	
 }

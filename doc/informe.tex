@@ -1,0 +1,214 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{t1enc}
+
+\usepackage[utf8]{inputenc}
+\usepackage{t1enc}
+\usepackage[spanish]{babel}
+\usepackage[pdftex,usenames,dvipsnames]{color}
+\usepackage[pdftex]{graphicx}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage[small,bf]{caption}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{times}
+
+\begin{document}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+\renewcommand{\lstlistingname}{C\'odigo Fuente}
+\lstloadlanguages{Octave} 
+\lstdefinelanguage{MyOctave}[]{Octave}{
+        deletekeywords={beta,det},
+        morekeywords={repmat}
+} 
+\lstset{
+        language=MyOctave,
+        stringstyle=\ttfamily,
+        showstringspaces = false,
+        basicstyle=\footnotesize\ttfamily,
+        commentstyle=\color{gray},
+        keywordstyle=\bfseries,
+        numbers=left,
+        numberstyle=\ttfamily\footnotesize,
+        stepnumber=1,                   
+        framexleftmargin=0.20cm,
+        numbersep=0.37cm,              
+        backgroundcolor=\color{white},
+        showspaces=false,
+        showtabs=false,
+        frame=l,
+        tabsize=4,
+        captionpos=b,               
+        breaklines=true,             
+        breakatwhitespace=false,      
+        mathescape=true
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% begin TITLE PAGE %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+        \vfill
+        \thispagestyle{empty}
+        \begin{center}
+                \includegraphics{./images/itba_logo.png}
+                \vfill
+                \Huge{Big Data}\\
+                \vspace{1cm}
+                \Huge{Trabajo Pr\'actico 1}\\
+        \end{center}
+        \vfill
+        \large{
+        \begin{tabular}{lcr}
+                Crespo, Alvaro && 50758 \\
+                Petit, Alejandro && XXXXX \\
+                Susnisky, Dario && 50592 \\
+                Videla, Máximo && 51071\\                
+        \end{tabular}
+}
+        \vspace{2cm}
+        \begin{center}
+                \large{07 de octubre de 2013}\\
+        \end{center}
+\end{titlepage}
+\newpage
+
+\setcounter{page}{1}
+
+% \tableofcontents
+% \newpage
+\section{Problemas encontrados}
+
+Al correr inicialmente los jobs de map-reduce que utilizaban tablas de HBase, tuvimos errores por no setear correctamente la configuración de Zookeeper. Estos errores
+pudieron solucionarse configurando correctamente las propiedades $HBASE_CONFIGURATION_ZOOKEEPER_QUORUM$ y $HBASE_CONFIGURATION_ZOOKEEPER_CLIENTPORT$.\\
+
+Al momento de implementar joins con los archivos CSV, nos encontramos con el problema de como hacer que los archivos estén disponibles en cada mapper. La clase 
+\textit{Distributed Cache} nos sirvió para justamente sobrepasar esta dificultad.\\
+
+Al correr Pig en forma map-reduce con hadoop pseudo-distribuido, tuvimos problemas en un momento ya que hadoop recordaba la IP externa de la computadora y, 
+por lo tanto, no encontraba el reducer.\\
+
+En varios momentos, tanto al implementar las métricas con MapReduce en Java y con Hive, nos encontramos con irritantes errores de formato en algunos archivos CSV. En particular,
+en los archivos \textit{airports.csv} y \textit{carriers.csv}, todos los campos estabán entre comillas dobles (``) y esto producía algunos errores al hacer joins. Es por esto que 
+previo a hacer los joins tuvimos que efectuar algunas moficiaciones en los datos, obviamente sin modificar los archivos del HDFS. Simplemente es eliminaron las comillas dobles 
+previo a la utilización de los datos de estos archivos.\\
+
+\section{Decisiones de implementación}
+
+Para las métricas implementadas con MapReduce en Java, decidimos implementar, en todos los casos, \textit{Broadcast Join} al hacer joins por 2 razones principales: en todos los casos,
+uno de los \textit{dataset} siempre se podía asumir pequeño (3000 aeropuertos, 1500 aerolíneas y 5000 aviones), y además es la opción más fácil de implementar (en algunos casos se
+utilizaban tablas de \textit{HBase} y en otros se aprovechaba el \textit{Distributed Cache} de Hadoop para distribuir los archivos CSV).\\
+
+Decidimos implementar 2 simples métricas extra, como son la cantidad de vuelos totales de cada aerolínea, y la proporción de vuelos cancelados sobre el total de vuelos para cada 
+aerolínea. Otras métricas interesantes hubieran sido agregarle a estas métricas extra la posibilidad de discriminar por año además de por aerolínea, ya sea la cantidad de vuelos
+o la proporción de vuelos cancelados.
+
+\section{Instrucciones para ejecutar las métricas}
+
+    \subsection{Map Reduce}
+        \subsubsection{Métrica 1 - Promedio de demora de despegue por mes por estado}
+            \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -avgTakeOffDelay}
+        \subsubsection{Métrica 2 - Vuelos Cancelados por aerolínea}
+            \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -cancelledFlights -carriersPath 'carriers\_path'}
+        \subsubsection{Métrica 3 - Millas voladas por aerolínea por año}
+            \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -milesFlown -carriersPath 'carriers\_path'}
+        \subsubsection{Métrica 4 - Horas de vuelo por fabricante}
+            \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -flightHours -manufacturer 'target\_manufacturer\_name'}
+        \subsubsection{Métrica 13(OPCIONAL) - Cantidad de vuelos por aerolínea}
+            \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -flightCount -carriersPath 'carriers\_path'}
+        \subsubsection{Métrica 14(OPCIONAL) - Proporción de vuelos cancelados por aerolínea}
+            \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -propCancelledFLights -carriersPath 'carriers\_path'}
+
+    \subsection{Hive}
+        %TODO
+
+    \subsection{Pig}
+        %TODO
+
+\section{Formato de los resultados de las métricas}
+
+    \subsection{Map Reduce}
+        \subsubsection{Métrica 1 - Promedio de demora de despegue por mes por estado}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                ESTADO-MES PROMEDIO \\
+            \end{center}
+            donde el estado se representa por dos letrás mayúsculas (su código postal) y el mes escrito en letras y en ingleś.
+
+            Un ejemplo sería\\
+            \begin{center}
+                WY-September    10.518987341772151\\
+            \end{center}
+
+        \subsubsection{Métrica 2 - Vuelos Cancelados por aerolínea}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AEROLINEA CANTIDAD\\
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+               United Air Lines Inc.   34\\
+            \end{center}
+
+        \subsubsection{Métrica 3 - Millas voladas por aerolínea por año}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AEROLINEA-AÑO CANTIDAD\\
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+               Delta Air Lines Inc.-1987   1171792\\
+            \end{center}
+
+        \subsubsection{Métrica 4 - Horas de vuelo por fabricante}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                NRO\_AVION CANTIDAD\_HORAS
+            \end{center}
+            Cabe destacar que la cantidad de horas se encuentra en decimal ya que no se efectuaron redondeos.
+
+            Un ejemplo sería\\
+            \begin{center}
+                N997AT  191.93333333333334\\
+            \end{center}
+
+        \subsubsection{Métrica 13(OPCIONAL) - Cantidad de vuelos por aerolínea}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AEROLINEA CANTIDAD\\
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+               United Air Lines Inc.   324\\
+            \end{center}
+
+         \subsubsection{Métrica 14(OPCIONAL) - Proporción de vuelos cancelados por aerolínea}
+            Los resultados de esta métrica tienen el siguiente formato:\\
+            \begin{center}
+                AEROLINEA PROPORCION\\
+            \end{center}
+
+            Un ejemplo sería\\
+            \begin{center}
+               Delta Air Lines Inc.    0.008937960042060988\\
+            \end{center}
+
+    \subsection{Hive}
+        %TODO
+
+    \subsection{Pig}
+        %TODO
+
+\end{document}

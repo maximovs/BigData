@@ -19,6 +19,11 @@ import ar.edu.itba.bigdata.flightHoursByManufacturer.FlightHoursByManufacturerMa
 import ar.edu.itba.bigdata.flightHoursByManufacturer.FlightHoursByManufacturerReducer;
 import ar.edu.itba.bigdata.milesFlown.MilesFlownMapper;
 import ar.edu.itba.bigdata.milesFlown.MilesFlownReducer;
+import ar.edu.itba.bigdata.optional.flightCount.FlightCountMapper;
+import ar.edu.itba.bigdata.optional.flightCount.FlightCountReducer;
+import ar.edu.itba.bigdata.optional.proportionalCancelledFlights.ProportionalCancelledFlightsMapper;
+import ar.edu.itba.bigdata.optional.proportionalCancelledFlights.ProportionalCancelledFlightsReducer;
+
 
 @SuppressWarnings("all")
 public class CLIParser {
@@ -30,7 +35,9 @@ public class CLIParser {
 	private static final String MILES_FLOWN = "milesFlown";
 	private static final String FLIGHT_HOURS_MANUFACTURER = "flightHours";
 	private static final String TARGET_MANUFACTURER = "manufacturer";
-	private static final String CARRIERS_PATH = "/user/hadoop/ITBA/TP1/INPUT/SAMPLE/ref/carriers.csv";
+	private static final String CARRIERS_PATH = "carriersPath";
+	private static final String FLIGHT_COUNT = "flightCount";
+	private static final String PROPORCIONAL_CANCELLED_FLIGHTS = "propCancelledFlights";
 
 	private static Options getInputOptions() {
         final Options opts = new Options();
@@ -55,7 +62,7 @@ public class CLIParser {
 
         final Option milesFlown = OptionBuilder.withLongOpt(MILES_FLOWN)
 								                .withDescription("Calculate the number of miles flown for each airline and year.")
-								                .hasArg()
+
 								                .create(MILES_FLOWN);
 
         final Option flightHours = OptionBuilder.withLongOpt(FLIGHT_HOURS_MANUFACTURER)
@@ -66,7 +73,22 @@ public class CLIParser {
 											.withDescription("The target manufacturer.")
 											.hasArg()
 											.create(TARGET_MANUFACTURER);
-        
+
+
+		final Option carriersPath = OptionBuilder.withLongOpt(CARRIERS_PATH)
+												.withDescription("The path to the carriers file/folder.")
+												.hasArg()
+												.create(CARRIERS_PATH);
+
+		final Option flightCount = OptionBuilder.withLongOpt(FLIGHT_COUNT)
+				.withDescription("Count the total amount of flights of each airline.")
+				.create(FLIGHT_COUNT);
+		
+		final Option proportionalCancelledFlights = OptionBuilder.withLongOpt(PROPORCIONAL_CANCELLED_FLIGHTS)
+				.withDescription("Calculate de proportional amount of cancelled flights over total amount of flights for each airline.")
+				.create(PROPORCIONAL_CANCELLED_FLIGHTS);
+		
+
         
         opts.addOption(inFile);
         opts.addOption(outPath);
@@ -75,6 +97,11 @@ public class CLIParser {
         opts.addOption(milesFlown);
         opts.addOption(flightHours);
         opts.addOption(manufacturer);
+
+        opts.addOption(carriersPath);
+        opts.addOption(flightCount);
+        opts.addOption(proportionalCancelledFlights);
+
         return opts;
     }
 
@@ -96,20 +123,32 @@ public class CLIParser {
             	config.setMapper(AVGTakeOffDelayMapper.class);
             	config.setReducer(AVGTakeOffDelayReducer.class);
             	
-            } else if(line.hasOption(CANCELLED_FLIGHTS)) {
+
+            } else if(line.hasOption(CANCELLED_FLIGHTS) && line.hasOption(CARRIERS_PATH)) {
             	config.setMapper(CancelledFlightsMapper.class);
             	config.setReducer(CancelledFlightsReducer.class);
-            	config.setExtra("carriersPath", CARRIERS_PATH);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
             	
-            } else if(line.hasOption(MILES_FLOWN)) {
+            } else if(line.hasOption(MILES_FLOWN) && line.hasOption(CARRIERS_PATH)) {
             	config.setMapper(MilesFlownMapper.class);
             	config.setReducer(MilesFlownReducer.class);
-            	config.setExtra("carriersPath", CARRIERS_PATH);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
             	
-            } else if(line.hasOption(FLIGHT_HOURS_MANUFACTURER)) {
+            } else if(line.hasOption(FLIGHT_HOURS_MANUFACTURER) && line.hasOption(TARGET_MANUFACTURER)) {
             	config.setMapper(FlightHoursByManufacturerMapper.class);
             	config.setReducer(FlightHoursByManufacturerReducer.class);
             	config.setExtra("manufacturer", line.getOptionValue(TARGET_MANUFACTURER));
+            } else if(line.hasOption(FLIGHT_COUNT) && line.hasOption(CARRIERS_PATH)) {
+            	config.setMapper(FlightCountMapper.class);
+            	config.setReducer(FlightCountReducer.class);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
+            } else if(line.hasOption(PROPORCIONAL_CANCELLED_FLIGHTS) && line.hasOption(CARRIERS_PATH)) {
+            	config.setMapper(ProportionalCancelledFlightsMapper.class);
+            	config.setReducer(ProportionalCancelledFlightsReducer.class);
+            	config.setExtra("carriersPath", line.getOptionValue(CARRIERS_PATH));
+            } else {
+            	return null;
+
             }
             
             return config;
@@ -117,7 +156,9 @@ public class CLIParser {
     }
 
     private static void printHelp(Options opts) {
-        new HelpFormatter().printHelp("hadoop jar bigdata-tp1.jar", opts);
+
+        new HelpFormatter().printHelp("hadoop jar bigdata-tp1-jar-with-dependencies.jar", opts);
+
     }
 
     public static AppConfig getAppConfig(String[] args) throws ParseException, FileNotFoundException {
