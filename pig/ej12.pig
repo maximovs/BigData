@@ -7,6 +7,6 @@ flights = FOREACH flights GENERATE CONCAT((chararray)(year),CONCAT('-',CONCAT((c
 flights = FOREACH flights GENERATE fullDate, ((DepDelayInMin>0) ? DepDelayInMin : 0) AS DepDelayInMin;
 grouped = GROUP flights BY fullDate;
 
-result = FOREACH grouped GENERATE group, SUM(flights.DepDelayInMin)/60 As DepTimeHourDelay;
+result = FOREACH grouped GENERATE group, (AVG(flights.DepDelayInMin)/60 As DepTimeHourDelay;
 
 STORE result INTO '$output' USING PigStorage (',');
