@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS flights;
 DROP TABLE IF EXISTS airports;
 DROP TABLE IF EXISTS tmp_table;
-create table flights (
+create external table flights (
 	year int,
 	month int,
 	dayOfMonth int,
@@ -33,11 +33,10 @@ create table flights (
 	LateAircraftDelay int
 )
 row format delimited fields terminated by ','
-stored as textfile;
+stored as textfile
+location '${hiveconf:flightsPath}';
 
-LOAD DATA INPATH '${hiveconf:flightsPath}' into table flights;
-
-create table airports (
+create external table airports (
 	IATA string,
 	name string,
 	city string,
@@ -47,9 +46,8 @@ create table airports (
 	longintude double
 )
 row format delimited fields terminated by ','
-stored as textfile;
-
-LOAD DATA INPATH '${hiveconf:airportsPath}' into table airports;
+stored as textfile
+location '${hiveconf:airportsPath}';
 
 add jar Rank.jar;
 create temporary function rank as 'com.example.hive.udf.Rank';

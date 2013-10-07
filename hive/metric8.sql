@@ -2,7 +2,7 @@ add jar PadInteger.jar;
 create temporary function padInt as 'com.example.hive.udf.PadInteger';
 
 DROP TABLE IF EXISTS flights;
-create table flights (
+create external table flights (
 	year int,
 	month int,
 	dayOfMonth int,
@@ -34,9 +34,8 @@ create table flights (
 	LateAircraftDelay int
 )
 row format delimited fields terminated by ','
-stored as textfile;
-
-LOAD DATA INPATH '${hiveconf:flightsPath}' into table flights;
+stored as textfile
+location '${hiveconf:flightsPath}';
 
 --add jar Rank.jar;
 --create temporary function rank as 'com.example.hive.udf.Rank';
