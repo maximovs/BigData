@@ -110,7 +110,10 @@ Un segundo problema con Hive, a la hora de imprimir las salidas a archivos. La s
 
 Además, cabe mencionar que la métrica 5, tiene un elevado tiempo de ejecución. Este es un problema de especial interés ya que al ejecutarlo en sistemas locales, esto no se presentaba como un problema y fue evidente al probarlo en el \textit{cluster}. Sería una posible mejora optimizar esta métrica para que su tiempo de ejecución sea menor al actual.
 
-Por último, nos encontramos con un problema al crear y popular las tablas medianto los scripts en Hive. Al correr los scripts, los archivos csv originales se veian borrados. Finalmente logramos sortear este problema definiendo tablas externas y modificando la manera en la que son populadas.
+Por último, nos encontramos con un problema al crear y popular las tablas medianto los scripts en Hive. Al correr los scripts, los archivos csv originales se veian borrados. Finalmente logramos sortear este problema definiendo tablas externas y modificando la manera en la que son populadas.\\
+
+Con respecto a los unit test, se instaló Cobertura como plugin de eclipse para verificar su funcionamiento, y luego se procedió a agregar como plugin en el pom. Al momento de compilar con mvn, este se encarga de generar los reportes correspondientes en XML y HTML.
+Se agrego también al pom las dependencias de JUnit para testeo unitario y MRUnit para testear las implementaciones de Map-Reduce. La API de MRUnit permite realizar los tests sobre los métodos de map y reduce. Es decir que brinda una interfaz para facilitar la verificación del correcto funcionamiento de los mismos. MRUnit permite crear y enviar una entrada al mapper y al reducer y volcar su salida de forma tal de poder compararla con una salida esperada y conocida. \\
 
 \section{Decisiones de implementación}
 
