@@ -133,13 +133,13 @@ o la proporción de vuelos cancelados.
             \scriptsize{hadoop jar bigdata-tp1-jar-with-dependencies.jar -inPath 'input\_path' -outPath 'output\_path' -propCancelledFLights -carriersPath 'carriers\_path'}
 
     \subsection{Hive}
-         \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
+        \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
         \scriptsize{hive -S -f metric5-depDelayTop5.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' output='output\_path'}
         \subsubsection{Métrica 6 - Imprevistos 2005}
         \scriptsize{hive -S -f metric6-2005FlightStats.sql -hiveconf flightsPath='input\_flights\_path' [airport='airport\_IATA'] output='output\_path'}
         \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
         \scriptsize{hive -S -f metric7.sql -hiveconf flightsPath='input\_flights\_path' airportsPath='input\_airports\_path' output='output\_path'}
-        \subsubsection{Métrica 8 - Huracanes con más cancelacioens}
+        \subsubsection{Métrica 8 - Huracanes con más cancelaciones}
         \scriptsize{hive -S -f metric8.sql -hiveconf flightsPath='input\_flights\_path' output='output\_path'}
 
     \subsection{Pig}
@@ -153,7 +153,7 @@ o la proporción de vuelos cancelados.
             \scriptsize{pig -param flights=FLIGHTS\_PATH -param output=OUTPUT\_PATH ej11.pig}
         \subsubsection{Métrica 13 - Promedio diario de demora de despegue en el año 2001 }
             \scriptsize{pig -param flights=FLIGHTS\_PATH -param output=OUTPUT\_PATH ej12.pig}
-       
+
 \section{Formato de los resultados de las métricas}
 
     \subsection{Map Reduce}
@@ -225,8 +225,20 @@ o la proporción de vuelos cancelados.
                Delta Air Lines Inc.    0.008937960042060988\\
             \end{center}
 
-    \subsection{Hive}
-        %TODO
+        \subsection{Hive}
+        El output de Hive se puede ver en un archivo en el directorio especificado al ejecutar el \textit{script}. Como fue mencionado en los problemas encontrados, la separación entre los campos se da por el caracter \"^A\" mientras que las tuplas están separados por \"\\N\"..
+        A continuación se detalla el órden de los campos para cada una de las métricas.
+        \subsubsection{Métrica 5 - Top 5 Aeropuertos con demora de despegue por año}
+        Año - Puesto - Aeropuerto - Horas totales de demora
+        \subsubsection{Métrica 6 - Imprevistos 2005}
+        Fecha - Cantidad de vuelos demorados - Suma de horas de demora - Cantidad de vuelos demorados - Cantidad de vuelos desviados - Cantidad de vuelos cancelados por mal clima
+        \subsubsection{Métrica 7 - Top 5 Aeropuertos con mayor promedio de demoras}
+        Aeropuerto - Puesto - Promedio de vuelos demorados por día
+        \subsubsection{Métrica 8 - Huracanes con más cancelaciones}
+        Huracan - Fecha - Cantidad de vuelos cancelados
+
+
+
 
     \subsection{Pig}
        \subsubsection{Métrica 9 - Las rutas más voladas}
@@ -258,8 +270,8 @@ o la proporción de vuelos cancelados.
             \begin{center}
                 ORIGEN HORARIO
             \end{center}
-            Cabe destacar que las horas se muestran en el formato h:m pero no se agrega un 0 adelante de los minutos si son menores a 10, es decir, 
-            las seis y cinco de la tarde se representan de la siguiente manera: 6:5. Otro comentario sería que se listan todos los aeropuertos, incluso 
+            Cabe destacar que las horas se muestran en el formato h:m pero no se agrega un 0 adelante de los minutos si son menores a 10, es decir,
+            las seis y cinco de la tarde se representan de la siguiente manera: 6:5. Otro comentario sería que se listan todos los aeropuertos, incluso
             en los que no se realizó ningún vuelo, estos se indican dejando la hora en blanco.
 
             Un ejemplo sería\\
@@ -278,5 +290,4 @@ o la proporción de vuelos cancelados.
             \begin{center}
                 2001-12-31  0.298048048048048\\
             \end{center}
-
 \end{document}
