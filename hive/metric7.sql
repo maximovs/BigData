@@ -101,7 +101,7 @@ select regexp_replace(a.IATA, '\"', ''),
 regexp_replace(a.name, '\"', ''),
 count(*)
 FROM airports a
-INNER JOIN flights arr ON regexp_replace(a.IATA, '\"', '') = arr.originIATA
+INNER JOIN flights arr ON regexp_replace(a.IATA, '\"', '') = arr.destIATA
 WHERE
 (
     (arr.year = 2005 AND arr.month = 10 AND arr.dayOfMonth >= 15 AND arr.dayOfMonth <= 26)
@@ -123,7 +123,7 @@ select regexp_replace(a.IATA, '\"', ''),
 regexp_replace(a.name, '\"', ''),
 count(*)
 FROM airports a
-INNER JOIN flights arr ON regexp_replace(a.IATA, '\"', '') = arr.originIATA
+INNER JOIN flights arr ON regexp_replace(a.IATA, '\"', '') = arr.destIATA
 WHERE
 (
     (arr.year = 2005 AND arr.month = 10 AND arr.dayOfMonth >= 15 AND arr.dayOfMonth <= 26)
