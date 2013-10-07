@@ -107,7 +107,11 @@ previo a la utilización de los datos de estos archivos.\\
 
 Respecto a Hive, encontramos ciertos problemas al parametrizar los \textit{scripts}. Esto trajo particulares complicaciones al implementar la métrica 6, ya que en dicha métrica es posible recibir o no un parametro. En nuestros \textit{scripts} explotamos el hecho de que Hive permite el uso de variables del sistema mediante la linea de comandos (con el uso de -hiveconf). Una vez establecidas estas variables, Hive reemplaza las apariciones de estas variables por su valor real de forma similar a como funciona una macro. Sin embargo, en caso de no existir alguna variable, Hive las toma como texto plano. Para poder manejar estas situaciones, creamos una UDF que trata de discriminar si la variable existe, abusando del conocimiento que toda variable no existente contenera \"hiveconf\" en su texto.
 
-Hubo un segundo problema con Hive, a la hora de imprimir las salidas a archivos. La separación de los campos y las tuplas no son cómodos a la hora de leerlos, haciendo las salidas poco legibles. Esto podría solucionarse rápidamente con un \textit{script} de \textit{Bash} o ejecutando busquedas y reemplazos en editores con esta capacidad (como por ejemplo, \textit{vim}).
+Un segundo problema con Hive, a la hora de imprimir las salidas a archivos. La separación de los campos y las tuplas no son cómodos a la hora de leerlos, haciendo las salidas poco legibles. Esto podría solucionarse rápidamente con un \textit{script} de \textit{Bash} o ejecutando busquedas y reemplazos en editores con esta capacidad (como por ejemplo, \textit{vim}).
+
+Además, cabe mencionar que la métrica 5, tiene un elevado tiempo de ejecución. Este es un problema de especial interés ya que al ejecutarlo en sistemas locales, esto no se presentaba como un problema y fue evidente al probarlo en el \textit{cluster}. Sería una posible mejora optimizar esta métrica para que su tiempo de ejecución sea menor al actual.
+
+Por último, nos encontramos con un problema al crear y popular las tablas medianto los scripts en Hive. Las formas actuales que utilizan los \textit{scripts} para hacer esto derivan en que los archivos originales que poseen la información se ven borrados. Sería otra posible mejora solucionar este problema.
 
 \section{Decisiones de implementación}
 
