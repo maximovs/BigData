@@ -55,5 +55,6 @@ INSERT OVERWRITE DIRECTORY '${hiveconf:output}' select tmp_table.fc, count(tmp_t
         OR originIATA = '${hiveconf:airport}'
         OR destIATA ='${hiveconf:airport}'
     )
+    AND yearNum = 2005
 	order by fc
 ) tmp_table group by tmp_table.fc;
