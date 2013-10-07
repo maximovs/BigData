@@ -70,7 +70,7 @@
         \large{
         \begin{tabular}{lcr}
                 Crespo, Alvaro && 50758 \\
-                Petit, Alejandro && XXXXX \\
+                Petit, Alejandro && 48308\\
                 Susnisky, Dario && 50592 \\
                 Videla, Máximo && 51071\\
         \end{tabular}
@@ -98,7 +98,6 @@ Al correr Pig en forma map-reduce con hadoop pseudo-distribuido, tuvimos problem
 por lo tanto, no encontraba el reducer.\\
 
 En la métrica 10 de Pig, tuvimos algunos inconvenientes para hacer el join ya que, en algunos casos, no había vuelos cancelados y, en otros, no había vuelos que hayan despegado, por lo tanto, quedaban campos en null. Se solucionó haciendo un FULL OUTER JOIN y chequeando que los campos fueran null y reemplazando esos valores por 0. También se tomaban los valores de las fechas que no fueran null.\\
-
 
 En varios momentos, tanto al implementar las métricas con MapReduce en Java y con Hive, nos encontramos con irritantes errores de formato en algunos archivos CSV. En particular,
 en los archivos \textit{airports.csv} y \textit{carriers.csv}, todos los campos estabán entre comillas dobles (``) y esto producía algunos errores al hacer joins. Es por esto que
