@@ -17,7 +17,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>ar.edu.itba.bigdata.flume.Main</mainClass>
+							<mainClass>ar.edu.itba.bigdata.flume.ActiveMQSink</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -69,6 +69,16 @@
 		<repository>
 			<id>clojars</id>
 			<url>http://clojars.org/repo</url>
+		</repository>
+		<repository>
+			<id>repository.jboss.org-public</id>
+			<name>JBoss repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>proton</id>
+			<name>activemq repository</name>
+			<url>http://repo.fusesource.com/nexus/content/groups/public/org/apache/qpid/proton-api/0.3.0-fuse-2/</url>
 		</repository>
 	</repositories>
 
