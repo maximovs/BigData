@@ -1,0 +1,26 @@
+# Initialize agent's source, channel and sink
+
+#agent.sinks = flumeHDFS
+
+
+	# Setting the sink to HDFS
+	#agent.sinks.flumeHDFS.type = hdfs
+	#agent.sinks.flumeHDFS.hdfs.path = hdfs://localhost:9000/user/data/twitter
+	#agent.sinks.flumeHDFS.hdfs.fileType = DataStream
+
+	# Write format can be text or writable
+	#agent.sinks.flumeHDFS.hdfs.writeFormat = Text
+
+	# use a single csv file at a time
+	#agent.sinks.flumeHDFS.hdfs.maxOpenFiles = 1
+
+	# rollover file based on maximum size of 10 MB
+	#agent.sinks.flumeHDFS.hdfs.rollSize = 10485760
+
+	# never rollover based on the number of events
+	#agent.sinks.flumeHDFS.hdfs.rollCount = 0
+
+	# rollover file based on max time of 1 min
+	#agent.sinks.flumeHDFS.hdfs.rollInterval = 60
+
+#agent.sinks.flumeHDFS.channel = memoryChannel 
