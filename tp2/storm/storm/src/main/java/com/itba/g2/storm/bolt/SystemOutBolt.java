@@ -20,7 +20,11 @@ public class SystemOutBolt extends BaseRichBolt {
 
 		@Override
         public void execute(Tuple tuple){
-            System.out.println(tuple.getValue(0)+"  "+tuple.getValue(1));
+			String aux = "";
+			for(int i=0;i<tuple.size();i++){
+				aux += tuple.getValue(i);
+			}
+            System.out.println(aux);
             _collector.ack(tuple);
         }
 
