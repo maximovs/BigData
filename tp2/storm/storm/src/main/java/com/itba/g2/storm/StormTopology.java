@@ -3,7 +3,9 @@ package com.itba.g2.storm;
 import javax.jms.Session;
 
 import com.itba.g2.storm.bolt.CounterBolt;
+import com.itba.g2.storm.bolt.MockGroupingBolt;
 import com.itba.g2.storm.bolt.SystemOutBolt;
+import com.itba.g2.storm.bolt.SystemOutDumperBolt;
 import com.itba.g2.storm.jms.ActiveMQJmsProvider;
 import com.itba.g2.storm.jms.JsonJmsTupleProducer;
 import com.itba.g2.storm.spout.ClickGeneratorSpout;
@@ -29,8 +31,8 @@ public class StormTopology {
         sp.setJmsTupleProducer(new JsonJmsTupleProducer());
         
         builder.setSpout("tweet", sp, 10);        
-//        builder.setBolt("counter", new CounterBolt(), 3).shuffleGrouping("word");
-        builder.setBolt("persister", new SystemOutBolt(), 5).fieldsGrouping("tweet", new Fields("tweet"));
+        builder.setBolt("counter", new MockGroupingBolt(), 3).shuffleGrouping("tweet");
+        builder.setBolt("persister", new SystemOutDumperBolt(), 1).fieldsGrouping("counter", new Fields("groupId"));
                 
         Config conf = new Config();
         conf.setDebug(true);
@@ -43,7 +45,7 @@ public class StormTopology {
         
             LocalCluster cluster = new LocalCluster();
             cluster.submitTopology("test", conf, builder.createTopology());
-            Utils.sleep(10000);
+            Utils.sleep(100000);
             cluster.killTopology("test");
             cluster.shutdown();    
         }

@@ -36,7 +36,7 @@ public class JsonJmsTupleProducer implements JmsTupleProducer {
 		
 		try {
 			JSONObject obj = new JSONObject(json);
-			String aux  = obj.getJSONObject("text").toString();
+			String aux  = obj.getString("text");
 			if(!aux.isEmpty()){
 				values = new Values(aux);
 			}

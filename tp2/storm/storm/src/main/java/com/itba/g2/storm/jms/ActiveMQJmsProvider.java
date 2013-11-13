@@ -14,11 +14,12 @@ public class ActiveMQJmsProvider implements JmsProvider {
 
     private ConnectionFactory connectionFactory = null;
     private Destination destination = null;
+    private String dest = "Flume-Storm-Queue";
     
     public ActiveMQJmsProvider() throws NamingException{
-        this.connectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false"); 
-        Context jndiContext = new InitialContext();
-        this.destination = (Destination) jndiContext.lookup("dynamicQueues/FOO.BAR");        
+        this.connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616"); 
+//        Context jndiContext = new InitialContext();
+//        this.destination = (Destination) jndiContext.lookup("Flume-Storm-Queue");        
 
     }
     
@@ -40,5 +41,11 @@ public class ActiveMQJmsProvider implements JmsProvider {
     public Destination destination() throws Exception{
         return this.destination;
     }
+
+	@Override
+	public String getDestination() {
+		// TODO Auto-generated method stub
+		return dest;
+	}
 
 }

@@ -173,11 +173,11 @@ public class JmsSpout extends BaseRichSpout implements MessageListener {
                 this.collector = collector;
                 try {
                         ConnectionFactory cf = this.jmsProvider.connectionFactory();
-                        Destination dest = this.jmsProvider.destination();
+//                        Destination dest = this.jmsProvider.destination();
                         this.connection = cf.createConnection();
                         this.session = connection.createSession(false,
                                         this.jmsAcknowledgeMode);
-                        MessageConsumer consumer = session.createConsumer(dest);
+                        MessageConsumer consumer = session.createConsumer(session.createQueue("Flume-Storm-Queue"));
                         consumer.setMessageListener(this);
                         this.connection.start();
                         if (this.isDurableSubscription() && this.recoveryPeriod > 0){

@@ -26,4 +26,6 @@ public interface JmsProvider extends Serializable{
          * @throws Exception
          */
         public Destination destination() throws Exception;
+        
+        public String getDestination();
 }
