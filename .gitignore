@@ -14,6 +14,7 @@ target
 
 #MAC#
 *.DS_Store
+$HOME*
 
 #Latex files
 *.backup

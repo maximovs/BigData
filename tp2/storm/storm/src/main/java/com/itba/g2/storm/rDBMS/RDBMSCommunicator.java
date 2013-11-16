@@ -53,6 +53,29 @@ public class RDBMSCommunicator {
         }
         return result;
     }
+    public boolean updateRow(String table, String mainField, String countFielf,String gid, int ammount) {
+    	int result = 0;
+    	String sql = "INSERT INTO "+ table +" ("+mainField+","+countFielf+") VALUES (?,?) ON DUPLICATE KEY UPDATE "+countFielf+"=?";
+
+    	PreparedStatement prepstmt;
+		try {
+			prepstmt = con.prepareStatement(sql);
+//			prepstmt.setString(1, gid);
+//	    	prepstmt.setInt(2, ammount);
+//	    	prepstmt.setString(3, gid);
+//	    	prepstmt.setString(4, gid);
+//	    	prepstmt.setInt(5, ammount);
+			prepstmt.setString(1, gid);
+	    	prepstmt.setInt(2, ammount);
+	    	prepstmt.setInt(3, ammount);
+	    	result = prepstmt.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result!=0;
+    	
+    }
     public Map<String, String> getTableInformation(String tableName) {
         tableDetails = new HashMap<String, String>();
         try {

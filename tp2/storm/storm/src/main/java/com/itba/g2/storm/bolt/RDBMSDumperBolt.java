@@ -19,18 +19,23 @@ import backtype.storm.tuple.Tuple;
 /*
  * Bolt for dumping stream data into RDBMS
  */
-public class RDBMSDumperBolt  implements IBasicBolt {
+public class RDBMSDumperBolt  extends DumperBolt {
     private static final long serialVersionUID = 1L;
     private static transient RDBMSCommunicator communicator = null;
     private transient RDBMSConnector connector = new RDBMSConnector();
     private transient Connection con = null;
     private String tableName = null;
+    private String mainField = null;
+    private String countField = null;
+    
     private ArrayList<Object> fieldValues = new ArrayList<Object>();
 
     private List<String> list = null;
-    public RDBMSDumperBolt(String tableName, String dBUrl, String username, String password)           throws SQLException {
+    public RDBMSDumperBolt(String tableName, String dBUrl, String username, String password, String mainField, String countField)           throws SQLException {
         super();
         this.tableName = tableName;
+        this.mainField = mainField;
+        this.countField = countField;
         try {
             con = connector.getConnection(dBUrl, username, password);
         } catch (ClassNotFoundException e) {
@@ -38,26 +43,11 @@ public class RDBMSDumperBolt  implements IBasicBolt {
         }
         communicator = new RDBMSCommunicator(con);
     }
-    @Override
-    public void execute(Tuple input, BasicOutputCollector collector) {
-        fieldValues = new ArrayList<Object>();
-        fieldValues = (ArrayList<Object>) input.getValues();
-        list = input.getFields().toList();
-        try {
-            communicator.insertRow(this.tableName, list, fieldValues);
-        } catch (SQLException e) {
-            System.out.println("Exception occurred in adding a row ");
-            e.printStackTrace();
-        }
-    }
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {}
-    @Override
-    public Map<String, Object> getComponentConfiguration() {
-        return null;
-    }
-    @Override
-    public void prepare(Map stormConf, TopologyContext context) {}
-    @Override
-    public void cleanup() {}
+   
+	@Override
+	boolean store(String gid, int times) {
+		return communicator.updateRow(tableName, mainField, countField, gid, times);
+	}
+
+
 }
