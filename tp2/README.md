@@ -3,7 +3,7 @@ instalado y agregado a la variable de entorno PATH. Esto último se puede hacer 
 	export PATH=absolute-path/to/flumeDir/bin:$PATH
 
 Para verificar que flume está agregado al PATH se deberia poder correr desde la consola el comando
-	flume-ng 
+	flume-ng
 
 Para compilar el proyecto flume con el custom sink para activeMQ correr dentro de la carpeta flume
 	mvn clean package
@@ -18,3 +18,11 @@ Para compilar el proyecto storm con la topología correr dentro de la carpeta st
 
 Para correr la topología de storm correr dentro de la carpeta storm
 	TODO
+
+Para compilar el proyecto del consumidor de streams de Twitter correr dentro de la carpeta tweetsStream
+    mvn clean package
+
+Para correr el consumidor de streams de Twitter correr dentro de la carpeta tweetsStream
+    ???? <outputFolder> <terms>
+
+    donde <outputFolder> es la carpeta en donde se crearan los archivos de salida. Esta carpeta debe existir previamente. Paralelamente <terms> es la lista de términos a buscar separados por comas (","). Un ejemplo de términos podría ser "termino1,termino2,termino de prueba".
