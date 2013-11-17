@@ -57,7 +57,7 @@ public class ActiveMQSink extends AbstractSink implements Configurable {
 		logger.info("JMS sink starting", this.getName());
 
 		if (jmsConnectionFactory == null) {
-			jmsConnectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+			jmsConnectionFactory = new ActiveMQConnectionFactory("tcp://hadoop-2013-datanode-2:61616");
 			
 		}
 
