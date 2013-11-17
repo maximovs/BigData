@@ -97,6 +97,49 @@ A continuación se presenta un esquema general de la aplicación:
 
 \includegraphics[width=\linewidth]{images/tp2BD.png}
 
+\section{Decisiones de implementación}
+
+\subsection{Agente de Flume}
+Con respecto al agente de Flume se implementó un simple agente con un \textit{source}, 3 \textit{sinks} y 3 \textit{channels}, uno que vincule cada \textit{sink} con el
+\textit{source}.
+
+Para el \textit{source} se utilizó un \textit{Spooling Directory Source}, que viene dado en el paquete de Flume, que simplemente se queda observando un
+determinado directorio y cuando se agregan nuevos archivos, genera un evento nuevo por cada línea. En nuestro caso, cada línea es un objeto JSON con la información de un tweet.
+
+La decisión de tener varios \textit{sinks} vino por diferentes razones. En primer lugar, se utilizaron el \textit{Logger Sink} y el \textit{File Roll Sink}, que dirigen el output
+del agente de Flume a consola (mediante logs de debugging de \textit{Log4j}) y a archivos de texto en un directorio de salida, respectivamente. Esto tenía el objetivo principal de
+familiarizarnos con la nueva tecnología y a la vez ver el funcionamiento del \text{Spooling Directory Source} para nuestras necesidades. Pero luego también decidimos continuar
+utilizandolas para testear y verificar el correcto funcionamiento del \textit{ActiveMQ Sink} que implementamos.
+
+\subsection{Topología de Storm}
+
+Al implementar una topología en Storm que permita medir nuestra métrica desarrollamos el siguiente modelo:
+\begin{itemize}
+  \item Un \textit{Spout} encargado de tomar los datos de la cola de mensajes.
+  \item Un \textit{Bolt} que recibe todos los mensajes que envía el \textit{Spout} sin importar el orden. +
+		A su vez este \textit{Bolt} toma de \textit{HBase} todos los grupos de \textit{keywords} existentes y emite mensajes 
+		indicando cuántas menciones por grupo recibe por \textit{tweet}.
+  \item Un último \textit{Bolt} que se encarga de sumar todos los mensajes que recibe y guardar la cantidad de menciones de cada grupo en una base de datos \textit{MySQL}.
+\end{itemize}
+ 
+El \textit{Spout} está unido al primer \textit{Bolt} mediante \textit{ShuffleGrouping} ya que no importa el orden de los mismos.
+El primer \textit{Bolt} se encuentra unido al segundo con \textit{FilterGrouping} agrupando por el \textit{GroupId} ya que solamente un 
+\textit{Bolt} debe ser encargado de actualizar un element (en el ejemplo, uno de los partidos políticos) en la base de datos.
+
+Para probar la topología se implementaron \textit{Bolts} que hacen sus tareas omitiendo las conexiones a \textit{MySQL} y \textit{HBase}.
+Habiendo corroborado su correcto funcionamiento se implementaron luego, las versiones finales y completas.
+
+\subsection{Cliente de Twitter}
+
+\textit{Twitter} cuenta con 2 \textit{APIs} para consultar información. La primera es \textit{REST}, dandole a un desarrollador métodos para realizar pedidos HTTP apropiados,
+que contengan como respuesta lo que se esta buscando. Por otro lado, \textit{Twitter} cuenta con una \textit{API} de \textit{streams} que encola \textit{tweets} (u otros eventos)
+constantemente y con bajo costo, evitando el \textit{overhead} de la \textit{REST API}.
+
+Dada la naturaleza y los requerimientos de la aplicación, fue casi intuitiva la decisión de utilizar la segunda \textit{API}. Contando con esto y con la decisión de desarrollar
+la aplicación en \textit{Java}, se dicidió utilizar el cliente \textit{Hosebird} dado que proveía los servicios que buscabamos para nuestra aplicación (acceso a la
+\textit{Streaming API}, autenticación vía \textit{Oauth} y otros). Además, \textit{Hosebird} permite integración sencilla con \textit{Maven} y nos dió la serguridad de tener
+una prueba funcional en poco tiempo.
+
 \section{Problemas encontrados}
 
 \subsection{Agente de Flume}
@@ -114,38 +157,17 @@ era lo que necesitabamos.
 
 \subsection{Topología de Storm}
 
+La configuración de \textit{Storm} para encontrar \textit{activeMQ} en modo distribuido nos presentó un desafío importante. Si bien contabamos con la configuración local, 
+al comenzar a probar la aplicación en modo distribuido nos encontramos diversas complicaciones.
+
+Por otra parte, al implementar la topología, no fueron triviales las conexiones entre \textit{Spouts} y \textit{Bolts} ya que dependiendo del caso, requerían agrupaciones
+diferentes. Finalmente logramos encontrar agrupaciones que permitiesen llegar a nuestro objetivo.
+
 \subsection{Cliente de Twitter}
 
 Si bien en la versión final del proyecto se utilizó \textit{Hosebird client}, en un comienzo se intentó utilizar la librería \textit{Twitter4J}. En un principio, esta librería,
 parecía una potente posibilidad para consultar la \textit{Twitter API}. Finalmente se decidió utilizar \textit{Hosebird client} ya que provee una mejor documentación y un enfoque
 completo en la \textit{Streaming API} en vez de la \textit{REST API} (que es la que finalmente se decidió usar).
-
-\section{Decisiones de implementación}
-
-\subsection{Agente de Flume}
-Con respecto al agente de Flume se implementó un simple agente con un \textit{source}, 3 \textit{sinks} y 3 \textit{channels}, uno que vincule cada \textit{sink} con el
-\textit{source}.
-
-Para el \textit{source} se utilizó un \textit{Spooling Directory Source}, que viene dado en el paquete de Flume, que simplemente se queda observando un
-determinado directorio y cuando se agregan nuevos archivos, genera un evento nuevo por cada línea. En nuestro caso, cada línea es un objeto JSON con la información de un tweet.
-
-La decisión de tener varios \textit{sinks} vino por diferentes razones. En primer lugar, se utilizaron el \textit{Logger Sink} y el \textit{File Roll Sink}, que dirigen el output
-del agente de Flume a consola (mediante logs de debugging de \textit{Log4j}) y a archivos de texto en un directorio de salida, respectivamente. Esto tenía el objetivo principal de
-familiarizarnos con la nueva tecnología y a la vez ver el funcionamiento del \text{Spooling Directory Source} para nuestras necesidades. Pero luego también decidimos continuar
-utilizandolas para testear y verificar el correcto funcionamiento del \textit{ActiveMQ Sink} que implementamos.
-
-\subsection{Topología de Storm}
-
-\subsection{Cliente de Twitter}
-
-\textit{Twitter} cuenta con 2 \textit{APIs} para consultar información. La primera es \textit{REST}, dandole a un desarrollador métodos para realizar pedidos HTTP apropiados,
-que contengan como respuesta lo que se esta buscando. Por otro lado, \textit{Twitter} cuenta con una \textit{API} de \textit{streams} que encola \textit{tweets} (u otros eventos)
-constantemente y con bajo costo, evitando el \textit{overhead} de la \textit{REST API}.
-
-Dada la naturaleza y los requerimientos de la aplicación, fue casi intuitiva la decisión de utilizar la segunda \textit{API}. Contando con esto y con la decisión de desarrollar
-la aplicación en \textit{Java}, se dicidió utilizar el cliente \textit{Hosebird} dado que proveía los servicios que buscabamos para nuestra aplicación (acceso a la
-\textit{Streaming API}, autenticación vía \textit{Oauth} y otros). Además, \textit{Hosebird} permite integración sencilla con \textit{Maven} y nos dió la serguridad de tener
-una prueba funcional en poco tiempo.
 
 \section{Instrucciones para ejecutar la métrica}
 
