@@ -17,7 +17,7 @@
                                         </descriptorRefs>
                                         <archive>
                                                 <manifest>
-                                                        <mainClass>ar.edu.itba.bigdata.twitterclient.TwitterStreamConsumer</mainClass>
+                                                        <mainClass>TwitterStreamConsumer</mainClass>
                                                 </manifest>
                                         </archive>
                                 </configuration>
