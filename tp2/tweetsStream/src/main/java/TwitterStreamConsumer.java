@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -34,6 +33,7 @@ public class TwitterStreamConsumer {
 		String accessTokenSecret = "";
 		
 		String[] lineElements;
+		String trimmedLine;
 		
 		while (line != null)
 		{
@@ -41,25 +41,36 @@ public class TwitterStreamConsumer {
 			
 			if (lineElements.length == 2)
 			{
-				switch (lineElements[0].trim()) {
-				case "consumerKey": 
+				trimmedLine = lineElements[0].trim();
+				
+				if (trimmedLine.equals("consumerKey"))
+				{
 					consumerKey = lineElements[1].trim();
-					break;
-				case "consumerSecret": 
+					line = bf.readLine();
+					continue;
+				}
+				
+				if (trimmedLine.equals("consumerSecret"))
+				{
 					consumerSecret = lineElements[1].trim();
-					break;
-				case "accessToken":
+					line = bf.readLine();
+					continue;
+				}
+				
+				if (trimmedLine.equals("accessToken"))
+				{
 					accessToken = lineElements[1].trim();
-					break;
-				case "accessTokenSecret": 
+					line = bf.readLine();
+					continue;
+				}
+				
+				if (trimmedLine.equals("accessTokenSecret"))
+				{
 					accessTokenSecret = lineElements[1].trim();
-					break;
-				default:
-					break;
+					line = bf.readLine();
+					continue;
 				}
 			}
-			
-			line = bf.readLine();
 		}
 		
 		if (accessToken.equals("") || accessTokenSecret.equals("") || consumerSecret.equals("") || consumerKey.equals(""))
@@ -67,14 +78,51 @@ public class TwitterStreamConsumer {
 			System.out.println("Authentication isn't complete");
 			System.exit(1);
 		}
-		
-		ArrayList<String> search = Lists.newArrayList("hashtag");
-		
-		if (args.length > 0)
-		{
-			String[] keywords = args[0].split(",");
 			
-			search = new ArrayList<String>(Arrays.asList(keywords));
+		if (args.length <= 0)
+		{
+			System.out.println("You need to specify Output");
+			System.exit(1);
+		}
+		
+		String output = args[0];
+		
+		ArrayList<String> search = new ArrayList<String>();
+		
+		String[] keywords;
+		
+		if (args.length > 1)
+		{
+			String lastKeyword = null;
+			
+			for (int i = 1; i < args.length; i++)
+			{
+				keywords = args[i].split(",");
+				
+				if (keywords.length > 0)
+				{
+					if (lastKeyword == null)
+					{
+						lastKeyword = keywords[0];
+					}
+					else
+					{
+						lastKeyword = lastKeyword + " " + keywords[0];
+					}
+									
+					for (int j = 1; j < keywords.length; j++)
+					{
+						search.add(lastKeyword);
+						
+						lastKeyword = keywords[j];
+					}
+				}
+			}
+			search.add(lastKeyword);
+		}
+		else
+		{
+			search.add("hashtag");
 		}
 		
 		String searchString = search.toString();
@@ -82,8 +130,7 @@ public class TwitterStreamConsumer {
 		searchString = searchString.substring(1, searchString.length()-1);
 				
 		// Create an appropriately sized blocking queue
-		//TODO Decide size...
-		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
+		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(1000);
 		
 		StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
 	    // add some track terms
@@ -101,22 +148,16 @@ public class TwitterStreamConsumer {
 		Client hosebirdClient = builder.build();
 		
 		List<String> tweets = Lists.newArrayList();
-		
-		int i = 0;
-		
-		File folderTweets = new File("tweets");  
+			
+		File folderTweets = new File(output);  
 		  
 		if (!folderTweets.isDirectory())
 		{
-			folderTweets.mkdir();
+			System.out.println("Directory doesn't exist.");
+			System.exit(1);
 		}
 		
-		File subFolderTweets = new File("tweets/" + searchString);
-		
-		if (!subFolderTweets.isDirectory())
-		{
-			subFolderTweets.mkdir();
-		}
+		int i = 0;
 		
 		hosebirdClient.connect();
 		while (!hosebirdClient.isDone()) 
@@ -125,7 +166,7 @@ public class TwitterStreamConsumer {
 
 			if(!tweets.isEmpty()) 
 			{
-				PrintWriter printWriter = new PrintWriter("tweets/" + searchString + "/tweets" + i);
+				PrintWriter printWriter = new PrintWriter(output + "/tweets" + i);
 				
 				for (String tweet : tweets) 
 				{
