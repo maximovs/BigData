@@ -170,7 +170,7 @@ public class TwitterStreamConsumer {
 				
 				for (String tweet : tweets) 
 				{
-					printWriter.println(tweet);
+					printWriter.print(tweet);
 				}
 				
 				i++;
