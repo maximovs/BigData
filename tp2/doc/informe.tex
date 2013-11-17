@@ -89,32 +89,32 @@
 
 \section{Presentación del problema}
 El objetivo de este trabajo práctivo es el de implementar un proyecto que realice un procesamiento en tiempo real de datos obtenidos de \textit{Twitter}.
-Los \textit{tweets} se van descargando mediante un cliente y son procesados a medida que llegan. Para esto se utiliza \textit{Flume} detectando cuando llegan nuevos \textit{tweets}. 
+Los \textit{tweets} se van descargando mediante un cliente y son procesados a medida que llegan. Para esto se utiliza \textit{Flume} detectando cuando llegan nuevos \textit{tweets}.
 Una vez encolados los \textit{tweets} por \textit{Flume}, \textit{Storm} es el encargado de procesarlos, implementando las métricas deseadas. Para este último punto, \textit{Storm}
 toma ciertos datos de \textit{HBase} y finalmente vuelca los resultados de las métricas en una tabla en \textit{MySQL}.
 
 A continuación se presenta un esquema general de la aplicación:
 
-\includegraphics{images/tp2BD.png}
+\includegraphics[width=\linewidth]{images/tp2BD.png}
 
 \section{Problemas encontrados}
 
-\section{Agente de Flume}
+\subsection{Agente de Flume}
 El principal problema, o desafío, de la implementación del agente de Flume fue la necesidad de implementar un \textit{Sink} custom, para interactuar con la cola
 de \textbf{ActiveMQ}, ya el tanto para el \textit{Souce} como para los \textit{Channels}, utilizamos implementaciones como \text{Spooling Directory Source} o \textit{Memory Channel},
 que ya vienen provistas por Flume.
 
 Un problema, o una lección, que tuvimos con Flume fue que si bien es posible que un \textit{source} se conecte a varios \textit{channels}, no sucede lo mismo con los \textit{sinks}.
-Un \textit{sink} puede estar conectado a un y sólo un \textit{channel}. Además, al configurar el \textit{source} de nuestro agente con varios \textit{channels}, lo que 
+Un \textit{sink} puede estar conectado a un y sólo un \textit{channel}. Además, al configurar el \textit{source} de nuestro agente con varios \textit{channels}, lo que
 se denomina \textit{Fan Out Flow}, nos topamos con las
 diferentes formas en que un source puede estar configurado para manejar conexiones a varios \textit{channels}, o la ``política de Fan Out''. Existen dos formas o políticas para esto:
 replicar o multiplexar. En el primer caso, el \textit{source} le manda el evento generado a todos los \textit{channels} conectados, mientrás que en el segundo, el evento se envía
-a un subconjunto de ellos. En nuestro caso, nos topamos con un error al configurar varios \textit{channels} ya que, al parecer, el default en estos casos es multiplexar, lo cual no 
+a un subconjunto de ellos. En nuestro caso, nos topamos con un error al configurar varios \textit{channels} ya que, al parecer, el default en estos casos es multiplexar, lo cual no
 era lo que necesitabamos.
 
-\section{Topología de Storm}
+\subsection{Topología de Storm}
 
-\section{Cliente de Twitter}
+\subsection{Cliente de Twitter}
 
 Si bien en la versión final del proyecto se utilizó \textit{Hosebird client}, en un comienzo se intentó utilizar la librería \textit{Twitter4J}. En un principio, esta librería,
 parecía una potente posibilidad para consultar la \textit{Twitter API}. Finalmente se decidió utilizar \textit{Hosebird client} ya que provee una mejor documentación y un enfoque
@@ -122,29 +122,29 @@ completo en la \textit{Streaming API} en vez de la \textit{REST API} (que es la 
 
 \section{Decisiones de implementación}
 
-\section{Agente de Flume}
-Con respecto al agente de Flume se implementó un simple agente con un \textit{source}, 3 \textit{sinks} y 3 \textit{channels}, uno que vincule cada \textit{sink} con el 
-\textit{source}. 
+\subsection{Agente de Flume}
+Con respecto al agente de Flume se implementó un simple agente con un \textit{source}, 3 \textit{sinks} y 3 \textit{channels}, uno que vincule cada \textit{sink} con el
+\textit{source}.
 
-Para el \textit{source} se utilizó un \textit{Spooling Directory Source}, que viene dado en el paquete de Flume, que simplemente se queda observando un 
+Para el \textit{source} se utilizó un \textit{Spooling Directory Source}, que viene dado en el paquete de Flume, que simplemente se queda observando un
 determinado directorio y cuando se agregan nuevos archivos, genera un evento nuevo por cada línea. En nuestro caso, cada línea es un objeto JSON con la información de un tweet.
 
 La decisión de tener varios \textit{sinks} vino por diferentes razones. En primer lugar, se utilizaron el \textit{Logger Sink} y el \textit{File Roll Sink}, que dirigen el output
 del agente de Flume a consola (mediante logs de debugging de \textit{Log4j}) y a archivos de texto en un directorio de salida, respectivamente. Esto tenía el objetivo principal de
-familiarizarnos con la nueva tecnología y a la vez ver el funcionamiento del \text{Spooling Directory Source} para nuestras necesidades. Pero luego también decidimos continuar 
+familiarizarnos con la nueva tecnología y a la vez ver el funcionamiento del \text{Spooling Directory Source} para nuestras necesidades. Pero luego también decidimos continuar
 utilizandolas para testear y verificar el correcto funcionamiento del \textit{ActiveMQ Sink} que implementamos.
 
-\section{Topología de Storm}
+\subsection{Topología de Storm}
 
-\section{Cliente de Twitter}
+\subsection{Cliente de Twitter}
 
-\textit{Twitter} cuenta con 2 \textit{APIs} para consultar información. La primera es \textit{REST}, dandole a un desarrollador métodos para realizar pedidos HTTP apropiados, 
-que contengan como respuesta lo que se esta buscando. Por otro lado, \textit{Twitter} cuenta con una \textit{API} de \textit{streams} que encola \textit{tweets} (u otros eventos) 
+\textit{Twitter} cuenta con 2 \textit{APIs} para consultar información. La primera es \textit{REST}, dandole a un desarrollador métodos para realizar pedidos HTTP apropiados,
+que contengan como respuesta lo que se esta buscando. Por otro lado, \textit{Twitter} cuenta con una \textit{API} de \textit{streams} que encola \textit{tweets} (u otros eventos)
 constantemente y con bajo costo, evitando el \textit{overhead} de la \textit{REST API}.
 
-Dada la naturaleza y los requerimientos de la aplicación, fue casi intuitiva la decisión de utilizar la segunda \textit{API}. Contando con esto y con la decisión de desarrollar 
-la aplicación en \textit{Java}, se dicidió utilizar el cliente \textit{Hosebird} dado que proveía los servicios que buscabamos para nuestra aplicación (acceso a la 
-\textit{Streaming API}, autenticación vía \textit{Oauth} y otros). Además, \textit{Hosebird} permite integración sencilla con \textit{Maven} y nos dió la serguridad de tener 
+Dada la naturaleza y los requerimientos de la aplicación, fue casi intuitiva la decisión de utilizar la segunda \textit{API}. Contando con esto y con la decisión de desarrollar
+la aplicación en \textit{Java}, se dicidió utilizar el cliente \textit{Hosebird} dado que proveía los servicios que buscabamos para nuestra aplicación (acceso a la
+\textit{Streaming API}, autenticación vía \textit{Oauth} y otros). Además, \textit{Hosebird} permite integración sencilla con \textit{Maven} y nos dió la serguridad de tener
 una prueba funcional en poco tiempo.
 
 \section{Instrucciones para ejecutar la métrica}
@@ -152,7 +152,7 @@ una prueba funcional en poco tiempo.
 \small
 \section{Formato de los resultado de la métrica}
 
-Los resultados de la métrica implementada se almacenan en una tabla de MYSQL, conforme a los requerimientos de la cátedra. El esquema que definimos para esta tabla consiste 
+Los resultados de la métrica implementada se almacenan en una tabla de MYSQL, conforme a los requerimientos de la cátedra. El esquema que definimos para esta tabla consiste
 simplemente de los campos:
 
 \begin{itemize}
