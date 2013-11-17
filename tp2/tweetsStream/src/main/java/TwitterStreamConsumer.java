@@ -23,6 +23,7 @@ import com.twitter.hbc.httpclient.auth.OAuth1;
 public class TwitterStreamConsumer {
 	public static void main(String[] args) throws InterruptedException, IOException{
 		
+		// Reading Oauth Credentials
 		InputStream is = TwitterStreamConsumer.class.getResourceAsStream("/oauthcredentials");
 		BufferedReader bf = new BufferedReader(new InputStreamReader(is));
 		
@@ -75,18 +76,28 @@ public class TwitterStreamConsumer {
 		
 		if (accessToken.equals("") || accessTokenSecret.equals("") || consumerSecret.equals("") || consumerKey.equals(""))
 		{
-			System.out.println("Authentication isn't complete");
+			System.err.println("Authentication isn't complete");
 			System.exit(1);
 		}
 			
+		// Verifying output folder
 		if (args.length <= 0)
 		{
-			System.out.println("You need to specify Output");
+			System.err.println("You need to specify Output");
 			System.exit(1);
 		}
 		
 		String output = args[0];
 		
+		File folderTweets = new File(output);  
+		  
+		if (!folderTweets.isDirectory())
+		{
+			System.err.println("Directory doesn't exist.");
+			System.exit(1);
+		}
+		
+		// Parsing terms
 		ArrayList<String> search = new ArrayList<String>();
 		
 		String[] keywords;
@@ -125,10 +136,8 @@ public class TwitterStreamConsumer {
 			search.add("hashtag");
 		}
 		
-		String searchString = search.toString();
-		
-		searchString = searchString.substring(1, searchString.length()-1);
-				
+
+		// Preparing hosebird connection...
 		// Create an appropriately sized blocking queue
 		BlockingQueue<String> queue = new LinkedBlockingQueue<String>(1000);
 		
@@ -148,17 +157,10 @@ public class TwitterStreamConsumer {
 		Client hosebirdClient = builder.build();
 		
 		List<String> tweets = Lists.newArrayList();
-			
-		File folderTweets = new File(output);  
-		  
-		if (!folderTweets.isDirectory())
-		{
-			System.out.println("Directory doesn't exist.");
-			System.exit(1);
-		}
 		
 		int i = 0;
 		
+		// Let's connect and iterate!
 		hosebirdClient.connect();
 		while (!hosebirdClient.isDone()) 
 		{			
@@ -166,6 +168,7 @@ public class TwitterStreamConsumer {
 
 			if(!tweets.isEmpty()) 
 			{
+				// Generating output...
 				PrintWriter printWriter = new PrintWriter(output + "/tweets" + i);
 				
 				for (String tweet : tweets) 
@@ -173,14 +176,20 @@ public class TwitterStreamConsumer {
 					printWriter.print(tweet);
 				}
 				
+				System.out.println(tweets.size() + " tweets were written in tweets" + i);
+				
 				i++;
 				
 				printWriter.close();
 			}
+			else
+			{
+				System.out.println("No new tweets found...");
+			}
 			
 			tweets.clear();
 			
-			Thread.sleep(10000);
+			Thread.sleep(60000);
 		}
 	}
 }
