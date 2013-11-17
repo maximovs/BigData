@@ -1,3 +1,4 @@
+
 # Proyecto Flume 
 Se requiere que Flume se encuentre instalado y agregado a la variable de entorno PATH. 
 Esto último se puede hacer de la siguiente manera:
@@ -38,6 +39,14 @@ Una vez submiteada una topología, si se desea volverla a correr (volver a submi
 que otra que ya se corriío/submiteó), se debe dar de baja previamente. Esto se logra corriendo
 
 	storm kill topologyName
+
+# ActiveMQ 
+
+Tanto el proyecto Flume como el de Storm utilizan una cola de mensaje ActiveMQ, que debe estar correctamente instalado, 
+y cuya url es uno de los parámetros para correr el proyecto de Storm.
+
+Para monitorear el funcionamiento de las colas en ActiveMQ se puede acceder a 
+[http://hadoop-2013-datanode-2:8161/admin/queues.jsp](http://hadoop-2013-datanode-2:8161/admin/queues.jsp)
 
 # Proyecto TweetsStream
 
