@@ -1,7 +1,3 @@
-
-
-Estas instrucciones asumen que se cuenta con un entorno Unix, con ActiveMQ instalado y corriendo en el puerto default (61616), y Flume
-instalado y
 # Proyecto Flume 
 Se requiere que Flume se encuentre instalado y agregado a la variable de entorno PATH. 
 Esto último se puede hacer de la siguiente manera:
