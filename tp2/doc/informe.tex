@@ -1,0 +1,137 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{t1enc}
+
+\usepackage[utf8]{inputenc}
+\usepackage{t1enc}
+\usepackage[spanish]{babel}
+\usepackage[pdftex,usenames,dvipsnames]{color}
+\usepackage[pdftex]{graphicx}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage[small,bf]{caption}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{times}
+
+\begin{document}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+\renewcommand{\lstlistingname}{C\'odigo Fuente}
+\lstloadlanguages{Octave}
+\lstdefinelanguage{MyOctave}[]{Octave}{
+        deletekeywords={beta,det},
+        morekeywords={repmat}
+}
+\lstset{
+        language=MyOctave,
+        stringstyle=\ttfamily,
+        showstringspaces = false,
+        basicstyle=\footnotesize\ttfamily,
+        commentstyle=\color{gray},
+        keywordstyle=\bfseries,
+        numbers=left,
+        numberstyle=\ttfamily\footnotesize,
+        stepnumber=1,
+        framexleftmargin=0.20cm,
+        numbersep=0.37cm,
+        backgroundcolor=\color{white},
+        showspaces=false,
+        showtabs=false,
+        frame=l,
+        tabsize=4,
+        captionpos=b,
+        breaklines=true,
+        breakatwhitespace=false,
+        mathescape=true
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% begin TITLE PAGE %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+        \vfill
+        \thispagestyle{empty}
+        \begin{center}
+                \includegraphics{./images/itba_logo.png}
+                \vfill
+                \Huge{Big Data}\\
+                \vspace{1cm}
+                \Huge{Trabajo Pr\'actico 2}\\
+        \end{center}
+        \vfill
+        \large{
+        \begin{tabular}{lcr}
+                Crespo, Alvaro && 50758 \\
+                Petit, Alejandro && 48308\\
+                Susnisky, Dario && 50592 \\
+                Videla, Máximo && 51071\\
+        \end{tabular}
+}
+        \vspace{2cm}
+        \begin{center}
+                \large{18 de noviembre de 2013}\\
+        \end{center}
+\end{titlepage}
+\newpage
+
+\setcounter{page}{1}
+
+% \tableofcontents
+% \newpage
+\section{Problemas encontrados}
+
+\section{Agente de Flume}
+El principal problema, o desafío, de la implementación del agente de Flume fue la necesidad de implementar un \textit{Sink} custom, para interactuar con la cola
+de \textbf{ActiveMQ}, ya el tanto para el \textit{Souce} como para los \textit{Channels}, utilizamos implementaciones como \text{Spooling Directory Source} o \textit{Memory Channel},
+que ya vienen provistas por Flume.
+
+Un problema, o una lección, que tuvimos con Flume fue que si bien es posible que un \textit{source} se conecte a varios \textit{channels}, no sucede lo mismo con los \textit{sinks}.
+Un \textit{sink} puede estar conectado a un y sólo un \textit{channel}. Además, al configurar el \textit{source} de nuestro agente con varios \textit{channels}, lo que 
+se denomina \textit{Fan Out Flow}, nos topamos con las
+diferentes formas en que un source puede estar configurado para manejar conexiones a varios \textit{channels}, o la ``política de Fan Out''. Existen dos formas o políticas para esto:
+replicar o multiplexar. En el primer caso, el \textit{source} le manda el evento generado a todos los \textit{channels} conectados, mientrás que en el segundo, el evento se envía
+a un subconjunto de ellos. En nuestro caso, nos topamos con un error al configurar varios \textit{channels} ya que, al parecer, el default en estos casos es multiplexar, lo cual no 
+era lo que necesitabamos.
+
+\section{Topología de Storm}
+
+\section{Decisiones de implementación}
+
+\section{Agente de Flume}
+Con respecto al agente de Flume se implementó un simple agente con un \textit{source}, 3 \textit{sinks} y 3 \textit{channels}, uno que vincule cada \textit{sink} con el 
+\textit{source}. 
+
+Para el \textit{source} se utilizó un \textit{Spooling Directory Source}, que viene dado en el paquete de Flume, que simplemente se queda observando un 
+determinado directorio y cuando se agregan nuevos archivos, genera un evento nuevo por cada línea. En nuestro caso, cada línea es un objeto JSON con la información de un tweet.
+
+La decisión de tener varios \textit{sinks} vino por diferentes razones. En primer lugar, se utilizaron el \textit{Logger Sink} y el \textit{File Roll Sink}, que dirigen el output
+del agente de Flume a consola (mediante logs de debugging de \textit{Log4j}) y a archivos de texto en un directorio de salida, respectivamente. Esto tenía el objetivo principal de
+familiarizarnos con la nueva tecnología y a la vez ver el funcionamiento del \text{Spooling Directory Source} para nuestras necesidades. Pero luego también decidimos continuar 
+utilizandolas para testear y verificar el correcto funcionamiento del \textit{ActiveMQ Sink} que implementamos.
+
+\section{Topología de Storm}
+
+
+\section{Instrucciones para ejecutar la métrica}
+
+\small
+\section{Formato de los resultado de la métrica}
+
+Los resultados de la métrica implementada se almacenan en una tabla de MYSQL, conforme a los requerimientos de la cátedra. El esquema que definimos para esta tabla consiste 
+simplemente de los campos:
+
+\begin{itemize}
+    \item GroupId: El nombre del grupo o conjunto de palabras de interés
+    \item Ammount: La cantidad de menciones de palabras relacionadas con el grupo
+\end{itemize}
+
+
+\end{document}
