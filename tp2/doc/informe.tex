@@ -86,6 +86,17 @@
 
 % \tableofcontents
 % \newpage
+
+\section{Presentación del problema}
+El objetivo de este trabajo práctivo es el de implementar un proyecto que realice un procesamiento en tiempo real de datos obtenidos de \textit{Twitter}.
+Los \textit{tweets} se van descargando mediante un cliente y son procesados a medida que llegan. Para esto se utiliza \textit{Flume} detectando cuando llegan nuevos \textit{tweets}. 
+Una vez encolados los \textit{tweets} por \textit{Flume}, \textit{Storm} es el encargado de procesarlos, implementando las métricas deseadas. Para este último punto, \textit{Storm}
+toma ciertos datos de \textit{HBase} y finalmente vuelca los resultados de las métricas en una tabla en \textit{MySQL}.
+
+A continuación se presenta un esquema general de la aplicación:
+
+\includegraphics{images/tp2BD.png}
+
 \section{Problemas encontrados}
 
 \section{Agente de Flume}
