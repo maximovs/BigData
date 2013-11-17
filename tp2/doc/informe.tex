@@ -103,6 +103,12 @@ era lo que necesitabamos.
 
 \section{Topología de Storm}
 
+\section{Cliente de Twitter}
+
+Si bien en la versión final del proyecto se utilizó \textit{Hosebird client}, en un comienzo se intentó utilizar la librería \textit{Twitter4J}. En un principio, esta librería,
+parecía una potente posibilidad para consultar la \textit{Twitter API}. Finalmente se decidió utilizar \textit{Hosebird client} ya que provee una mejor documentación y un enfoque
+completo en la \textit{Streaming API} en vez de la \textit{REST API} (que es la que finalmente se decidió usar).
+
 \section{Decisiones de implementación}
 
 \section{Agente de Flume}
@@ -119,6 +125,16 @@ utilizandolas para testear y verificar el correcto funcionamiento del \textit{Ac
 
 \section{Topología de Storm}
 
+\section{Cliente de Twitter}
+
+\textit{Twitter} cuenta con 2 \textit{APIs} para consultar información. La primera es \textit{REST}, dandole a un desarrollador métodos para realizar pedidos HTTP apropiados, 
+que contengan como respuesta lo que se esta buscando. Por otro lado, \textit{Twitter} cuenta con una \textit{API} de \textit{streams} que encola \textit{tweets} (u otros eventos) 
+constantemente y con bajo costo, evitando el \textit{overhead} de la \textit{REST API}.
+
+Dada la naturaleza y los requerimientos de la aplicación, fue casi intuitiva la decisión de utilizar la segunda \textit{API}. Contando con esto y con la decisión de desarrollar 
+la aplicación en \textit{Java}, se dicidió utilizar el cliente \textit{Hosebird} dado que proveía los servicios que buscabamos para nuestra aplicación (acceso a la 
+\textit{Streaming API}, autenticación vía \textit{Oauth} y otros). Además, \textit{Hosebird} permite integración sencilla con \textit{Maven} y nos dió la serguridad de tener 
+una prueba funcional en poco tiempo.
 
 \section{Instrucciones para ejecutar la métrica}
 
