@@ -1,4 +1,5 @@
 package com.itba.g2.storm.bolt;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,14 +20,16 @@ import backtype.storm.tuple.Tuple;
 /*
  * Bolt for dumping stream data into RDBMS
  */
-public class RDBMSDumperBolt  extends DumperBolt {
+public class RDBMSDumperBolt  extends DumperBolt implements Serializable{
     private static final long serialVersionUID = 1L;
-    private static RDBMSCommunicator communicator = null;
     private RDBMSConnector connector = new RDBMSConnector();
-    private Connection con = null;
+//    private Connection con = null;
     private String tableName = null;
     private String mainField = null;
     private String countField = null;
+    private String dBUrl = null;
+    private String username = null;
+    private String password = null;
     
     private ArrayList<Object> fieldValues = new ArrayList<Object>();
 
@@ -36,16 +39,23 @@ public class RDBMSDumperBolt  extends DumperBolt {
         this.tableName = tableName;
         this.mainField = mainField;
         this.countField = countField;
-        try {
-            con = connector.getConnection(dBUrl, username, password);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        communicator = new RDBMSCommunicator(con);
+       this.dBUrl = dBUrl;
+       this.username = username;
+       this.password = password;
     }
    
 	@Override
 	boolean store(String gid, int times) {
+		 Connection con = null;
+	        try {
+	        	con = connector.getConnection(dBUrl, username, password);
+	        } catch (ClassNotFoundException e) {
+	            e.printStackTrace();
+	        } catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        RDBMSCommunicator communicator = new RDBMSCommunicator(con);
 		return communicator.addToRow(tableName, mainField, countField, gid, times);
 	}
 

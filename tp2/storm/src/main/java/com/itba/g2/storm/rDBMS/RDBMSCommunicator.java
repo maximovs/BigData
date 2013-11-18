@@ -1,4 +1,5 @@
 package com.itba.g2.storm.rDBMS;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +11,7 @@ import java.util.Map;
 /*
  * This class implements method for inserting data into RDBMS tables
  */
-public class RDBMSCommunicator {
+public class RDBMSCommunicator implements Serializable{
     private Connection con = null;
     private PreparedStatement prepstmt = null;
     private String queryStmt = null, queryValues = "";
