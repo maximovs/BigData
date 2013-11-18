@@ -116,14 +116,14 @@ utilizandolas para testear y verificar el correcto funcionamiento del \textit{Ac
 Al implementar una topología en Storm que permita medir nuestra métrica desarrollamos el siguiente modelo:
 \begin{itemize}
   \item Un \textit{Spout} encargado de tomar los datos de la cola de mensajes.
-  \item Un \textit{Bolt} que recibe todos los mensajes que envía el \textit{Spout} sin importar el orden. +
-		A su vez este \textit{Bolt} toma de \textit{HBase} todos los grupos de \textit{keywords} existentes y emite mensajes 
+  \item Un \textit{Bolt} que recibe todos los mensajes que envía el \textit{Spout} sin importar el orden.
+		A su vez este \textit{Bolt} toma de \textit{HBase} todos los grupos de \textit{keywords} existentes y emite mensajes
 		indicando cuántas menciones por grupo recibe por \textit{tweet}.
   \item Un último \textit{Bolt} que se encarga de sumar todos los mensajes que recibe y guardar la cantidad de menciones de cada grupo en una base de datos \textit{MySQL}.
 \end{itemize}
- 
+
 El \textit{Spout} está unido al primer \textit{Bolt} mediante \textit{ShuffleGrouping} ya que no importa el orden de los mismos.
-El primer \textit{Bolt} se encuentra unido al segundo con \textit{FilterGrouping} agrupando por el \textit{GroupId} ya que solamente un 
+El primer \textit{Bolt} se encuentra unido al segundo con \textit{FilterGrouping} agrupando por el \textit{GroupId} ya que solamente un
 \textit{Bolt} debe ser encargado de actualizar un element (en el ejemplo, uno de los partidos políticos) en la base de datos.
 
 Para probar la topología se implementaron \textit{Bolts} que hacen sus tareas omitiendo las conexiones a \textit{MySQL} y \textit{HBase}.
@@ -144,7 +144,7 @@ una prueba funcional en poco tiempo.
 
 \subsection{Agente de Flume}
 El principal problema, o desafío, de la implementación del agente de Flume fue la necesidad de implementar un \textit{Sink} custom, para interactuar con la cola
-de \textbf{ActiveMQ}, ya el tanto para el \textit{Souce} como para los \textit{Channels}, utilizamos implementaciones como \text{Spooling Directory Source} o \textit{Memory Channel},
+de \textit{AciveMQ}, ya el tanto para el \textit{Souce} como para los \textit{Channels}, utilizamos implementaciones como \text{Spooling Directory Source} o \textit{Memory Channel},
 que ya vienen provistas por Flume.
 
 Un problema, o una lección, que tuvimos con Flume fue que si bien es posible que un \textit{source} se conecte a varios \textit{channels}, no sucede lo mismo con los \textit{sinks}.
@@ -157,7 +157,7 @@ era lo que necesitabamos.
 
 \subsection{Topología de Storm}
 
-La configuración de \textit{Storm} para encontrar \textit{activeMQ} en modo distribuido nos presentó un desafío importante. Si bien contabamos con la configuración local, 
+La configuración de \textit{Storm} para encontrar \textit{activeMQ} en modo distribuido nos presentó un desafío importante. Si bien contabamos con la configuración local,
 al comenzar a probar la aplicación en modo distribuido nos encontramos diversas complicaciones.
 
 Por otra parte, al implementar la topología, no fueron triviales las conexiones entre \textit{Spouts} y \textit{Bolts} ya que dependiendo del caso, requerían agrupaciones
@@ -178,64 +178,80 @@ Se considera para la compilación de las 3 partes, que \textit{Maven} se encuent
 
 \subsubsection{Compilación}
 
-Para compilar el proyecto del consumidor de streams de \textit{Twitter} correr dentro de la carpeta tweetsStream::
+Para compilar el proyecto del consumidor de streams de \textit{Twitter} correr dentro de la carpeta tweetsStream:
+\\
 
     mvn clean package
-	
+\\
+\\
 Para que el proyecto se compile de forma correcta, en la carpeta /tweetsStream/src/main/resources debe existir el archivo oauthcredentials con el siguiente formato:
+\\
 
 consumerKey = xxxxxxxx
+
 consumerSecret = xxxxxxx
+
 accessToken = xxxxxxx
+
 accessTokenSecret = xxxxxxxx
 
 \subsubsection{Ejecución}
 
 Para correr el consumidor de streams de \textit{Twitter} correr dentro de la carpeta tweetsStream/target:
+\\
 
 	java -jar bigdata-twitterclient-jar-with-dependencies.jar <outputFolder> <terms>
-
-El parámetro <outputFolder> es el path relativo de la carpeta en donde se crearan los archivos de salida. Esta carpeta debe existir previamente. 
+\\
+\\
+El parámetro <outputFolder> es el path relativo de la carpeta en donde se crearan los archivos de salida. Esta carpeta debe existir previamente.
 Paralelamente <terms> es la lista de términos a buscar separados por comas (","). Un ejemplo de términos podría ser "termino1,termino2,termino de prueba".
 
 \subsection{Flume}
 
-Se requiere que \textit{Flume} se encuentre instalado y agregado a la variable de entorno PATH. 
+Se requiere que \textit{Flume} se encuentre instalado y agregado a la variable de entorno PATH.
 Esto último se puede hacer de la siguiente manera:
+\\
 
-export PATH=absolute-path/to/flumeDir/bin:$PATH
-
-Para verificar que \textit{Flume} está agregado al PATH se debería poder correr desde la consola el comando ``flume-ng`` y 
+export PATH=absolute-path/to/flumeDir/bin:\$PATH
+\\
+\\
+Para verificar que \textit{Flume} está agregado al PATH se debería poder correr desde la consola el comando ``flume-ng`` y
 verificar que el output es el del comando en cuestión.
 
 \subsubsection{Compilación}
 
 Para compilar el proyecto \textit{Flume} con el custom sink para activeMQ correr dentro de la carpeta flume
+\\
 
 	mvn clean package -DskipTests
 
 \subsubsection{Ejecución}
 
 Para correr el agente de \textit{Flume} correr dentro de la carpeta flume
+\\
 
 	sh run-flume.sh
-	
+\\
+\\
 La configuración del agente de \textit{Flume} se encuentra en la carpeta flume/conf.
-	
+
 \subsection{Storm}
 
 \subsubsection{Compilación}
 
 Para compilar el proyecto \textit{Storm} con la topología correr dentro de la carpeta storm
+\\
 
 	mvn clean package
 
 \subsubsection{Ejecución}
 
 Para correr la topología de \textit{Storm} correr dentro de la carpeta storm
-	
-	storm jar target/storm-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.itba.g2.storm.StormTopology topologyName sqlDBUrl table mainField countField user pass columnFamily
+\\
 
+	storm jar target/storm-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.itba.g2.storm.StormTopology topologyName sqlDBUrl table mainField countField user pass columnFamily
+\\
+\\
 Los parámetros son los siguientes:
 
 \begin{itemize}
@@ -250,6 +266,7 @@ Los parámetros son los siguientes:
 \end{itemize}
 
 Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo nombre) se debe dar de baja previamente la topología anterior. Esto se logra corriendo
+\\
 
 	storm kill topologyName
 
@@ -257,12 +274,12 @@ Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo 
 
 \subsubsection{ActiveMQ}
 
-Tanto el proyecto \textit{Flume} como el de \textit{Storm} utilizan una cola de mensaje \textit{ActiveMQ}, que debe estar correctamente instalado, 
+Tanto el proyecto \textit{Flume} como el de \textit{Storm} utilizan una cola de mensaje \textit{ActiveMQ}, que debe estar correctamente instalado,
 y cuya url es uno de los parámetros para correr el proyecto de \textit{Storm}.
 
-Para monitorear el funcionamiento de las colas en ActiveMQ se puede acceder a 
+Para monitorear el funcionamiento de las colas en ActiveMQ se puede acceder a
 [http://hadoop-2013-datanode-2:8161/admin/queues.jsp](http://hadoop-2013-datanode-2:8161/admin/queues.jsp)
-	
+
 \small
 \section{Formato de los resultado de la métrica}
 
