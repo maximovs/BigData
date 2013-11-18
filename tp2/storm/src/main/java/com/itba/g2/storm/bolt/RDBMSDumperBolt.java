@@ -21,9 +21,9 @@ import backtype.storm.tuple.Tuple;
  */
 public class RDBMSDumperBolt  extends DumperBolt {
     private static final long serialVersionUID = 1L;
-    private static transient RDBMSCommunicator communicator = null;
-    private transient RDBMSConnector connector = new RDBMSConnector();
-    private transient Connection con = null;
+    private static RDBMSCommunicator communicator = null;
+    private RDBMSConnector connector = new RDBMSConnector();
+    private Connection con = null;
     private String tableName = null;
     private String mainField = null;
     private String countField = null;
