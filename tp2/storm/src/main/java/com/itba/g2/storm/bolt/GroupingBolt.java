@@ -31,7 +31,7 @@ public abstract class GroupingBolt extends BaseRichBolt {
     	for(String key: groups.keySet()){
     		int times = 0;
     		for(String value: groups.get(key)){
-    			if(tweet.contains(value)){
+    			if(tweet.toLowerCase().contains(value.toLowerCase())){
     				times++;
     			}
     		}

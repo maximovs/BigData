@@ -16,8 +16,8 @@ public class ActiveMQJmsProvider implements JmsProvider {
     private Destination destination = null;
     private String dest = "Flume-Storm-Queue";
     
-    public ActiveMQJmsProvider() throws NamingException{
-        this.connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616"); 
+    public ActiveMQJmsProvider(String mqAdress) throws NamingException{
+        this.connectionFactory = new ActiveMQConnectionFactory(mqAdress); 
 //        Context jndiContext = new InitialContext();
 //        this.destination = (Destination) jndiContext.lookup("Flume-Storm-Queue");        
 

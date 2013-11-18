@@ -46,7 +46,7 @@ public class RDBMSDumperBolt  extends DumperBolt {
    
 	@Override
 	boolean store(String gid, int times) {
-		return communicator.updateRow(tableName, mainField, countField, gid, times);
+		return communicator.addToRow(tableName, mainField, countField, gid, times);
 	}
 
 

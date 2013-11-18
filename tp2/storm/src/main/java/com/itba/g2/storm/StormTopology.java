@@ -28,28 +28,36 @@ import backtype.storm.utils.Utils;
 public class StormTopology {
 
 	public static void main(String[] args) throws Exception {
-		String dbUrl = "jdbc:mysql://localhost/itba_barry";
+		String mqAddress = "tcp://hadoop-2013-datanode-7:61616";// http://hadoop-2013-datanode-2:8161/admin/queues.jsp
+		String dbUrl = "jdbc:mysql://hadoop-2013-datanode-6/itba_barry";
 		String table = "GroupsCount";
 		String mainField = "GroupId";
 		String countField = "Ammount";
 		String user = "barry";
 		String pass = "1234";
+		String hBaseTable = "itba_tp2_twitter_words";
 		String cf = "keyword";
 		if(args!=null){
 			if(args.length>1){
-				dbUrl = args[1];
+				mqAddress = args[1];
 				if(args.length>2){
-					table = args[2];
+					dbUrl = args[2];
 					if(args.length>3){
-						mainField = args[3];
+						table = args[3];
 						if(args.length>4){
-							countField = args[4];
+							mainField = args[4];
 							if(args.length>5){
-								user = args[5];
+								countField = args[5];
 								if(args.length>6){
-									pass = args[6];
+									user = args[6];
 									if(args.length>7){
-										cf = args[7];
+										pass = args[7];
+										if(args.length>8){
+											hBaseTable = args[8];
+											if(args.length>9){
+												cf = args[9];
+											}
+										}
 									}
 								}
 							}
@@ -57,17 +65,17 @@ public class StormTopology {
 					}
 				}
 			}else{
-				System.out.println("Running with default values. To change them use: topologyName dbUrl table mainField countField user pass columnFamily");
+				System.out.println("Running with default values. To change them use: topologyName activeMQaddress dbUrl sqltable mainField countField user pass hbaseTable columnFamily");
 			}
 		}
 		TopologyBuilder builder = new TopologyBuilder();
 		JmsSpout sp = new JmsSpout();
 		sp.setJmsAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
-		sp.setJmsProvider(new ActiveMQJmsProvider());
+		sp.setJmsProvider(new ActiveMQJmsProvider(mqAddress));
 		sp.setJmsTupleProducer(new JsonJmsTupleProducer());
 		RDBMSDumperBolt dumperBolt = new RDBMSDumperBolt(table, dbUrl, user, pass, mainField, countField);
 		builder.setSpout("tweet", sp, 5);        
-		builder.setBolt("counter", new HBaseGroupingBolt(cf), 10).shuffleGrouping("tweet");
+		builder.setBolt("counter", new HBaseGroupingBolt(hBaseTable, cf), 10).shuffleGrouping("tweet");
 		builder.setBolt("persister", dumperBolt, 3).fieldsGrouping("counter", new Fields("groupId"));
 
 		Config conf = new Config();

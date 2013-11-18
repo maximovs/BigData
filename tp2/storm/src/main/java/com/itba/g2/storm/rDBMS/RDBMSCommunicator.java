@@ -92,4 +92,27 @@ public class RDBMSCommunicator {
         }
         return tableDetails;
     }
+	public boolean addToRow(String tableName, String mainField,
+			String countField, String gid, int times) {
+		int result = 0;
+    	String sql = "INSERT INTO "+ tableName +" ("+mainField+","+countField+") VALUES (?,?) ON DUPLICATE KEY UPDATE "+countField+"="+ countField +" + ?";
+
+    	PreparedStatement prepstmt;
+		try {
+			prepstmt = con.prepareStatement(sql);
+//			prepstmt.setString(1, gid);
+//	    	prepstmt.setInt(2, ammount);
+//	    	prepstmt.setString(3, gid);
+//	    	prepstmt.setString(4, gid);
+//	    	prepstmt.setInt(5, ammount);
+			prepstmt.setString(1, gid);
+	    	prepstmt.setInt(2, times);
+	    	prepstmt.setInt(3, times);
+	    	result = prepstmt.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result!=0;
+	}
 }

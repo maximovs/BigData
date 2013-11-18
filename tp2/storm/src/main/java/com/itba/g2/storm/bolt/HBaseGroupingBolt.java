@@ -26,7 +26,7 @@ public class HBaseGroupingBolt extends GroupingBolt{
 	private byte[] KEYWORD_FAMILY = "keyword".getBytes();
 	Map<String,List<String>> values;
 	
-	public HBaseGroupingBolt(String cf) throws IOException {
+	public HBaseGroupingBolt(String tableName, String cf) throws IOException {
 		super();
 		values = new HashMap<String, List<String>>();
 		if(cf!=null){
@@ -35,7 +35,7 @@ public class HBaseGroupingBolt extends GroupingBolt{
 		Configuration conf = HBaseConfiguration.create();
 		conf.set(HBASE_CONFIGURATION_ZOOKEEPER_QUORUM, "hadoop-2013-datanode-1");
 		conf.set(HBASE_CONFIGURATION_ZOOKEEPER_CLIENTPORT, "2181");
-		HTable table = new HTable(conf, "itba_tp2_twitter_words");
+		HTable table = new HTable(conf, tableName);
 		
 		Scan scan = new Scan();
 		scan.setCaching(500);  
@@ -51,6 +51,13 @@ public class HBaseGroupingBolt extends GroupingBolt{
 			  }
 			 values.put(Bytes.toString(result.getRow()), l);
 			 }
+		 for (String key : values.keySet()) {
+			String s = key + ": ";
+			for(String val:values.get(key)){
+				s+= val + " ";
+			}
+			System.out.println(s);
+		}
 		 resultScanner.close();
 		 table.close();
 	}

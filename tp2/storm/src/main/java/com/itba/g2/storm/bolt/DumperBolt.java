@@ -29,8 +29,11 @@ public abstract class DumperBolt extends BaseRichBolt {
 			groups.put(gid, new AtomicInteger());
 		}
 		int times = groups.get(gid).addAndGet(tuple.getInteger(1));
-		if(!store(gid,times)) LOG.error("No se pudo actualizar la base de datos");
-        
+		if(!store(gid,times)){ 
+			LOG.error("No se pudo actualizar la base de datos");
+		}else{
+			groups.get(gid).addAndGet(times*-1);
+		}
         _collector.ack(tuple);
     }
 
