@@ -26,13 +26,13 @@ Para compilar el proyecto storm con la topología correr dentro de la carpeta st
 
 Para correr la topología de storm correr dentro de la carpeta storm
 	
-	storm jar target/storm-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.itba.g2.storm.StormTopology topologyName sqlDBUrl table mainField countField user pass columnFamily
+	storm jar target/storm-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.itba.g2.storm.StormTopology topologyName activeMQaddress sqlDBUrl sqlTable mainField countField sqlUser sqlPass HBaseTable columnFamily
 
 donde ``topologyName`` es el nombre que se le quiere dar a la topología de storm que se correrá, ``sqlDBUrl``
-es la url de la base de datos MYSQL donde se escribirán los resultados, ``table`` es el nombre de la tabla 
+es la url de la base de datos MYSQL donde se escribirán los resultados, ``activeMQaddress `` es el nombre de la cola de mensajes, ``sqlTable`` es el nombre de la tabla mysql 
 donde se almacenarán los resultados, ``mainField`` y ``countField`` son los campos de la tabla que representan
-el nombre de la agrupación y la cantidad de menciones, ``user`` y ``pass`` son el usuario y la contraseña para acceder
-a la base de datos MYSQL, y ``columnFamily`` es el nombre de la columna de la tabla de hbase que contiene las palabras
+el nombre de la agrupación y la cantidad de menciones, ``sqlUser `` y ``sqlPass `` son el usuario y la contraseña para acceder
+a la base de datos MYSQL, ``HBaseTable `` es el nombre de la table de HBase y ``columnFamily`` es el nombre de la columna de la tabla de hbase que contiene las palabras
 a buscar.
 
 Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo nombre) se debe dar de baja previamente la topología anterior. Esto se logra corriendo
