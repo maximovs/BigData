@@ -32,11 +32,10 @@ donde ``topologyName`` es el nombre que se le quiere dar a la topología de stor
 es la url de la base de datos MYSQL donde se escribirán los resultados, ``table`` es el nombre de la tabla 
 donde se almacenarán los resultados, ``mainField`` y ``countField`` son los campos de la tabla que representan
 el nombre de la agrupación y la cantidad de menciones, ``user`` y ``pass`` son el usuario y la contraseña para acceder
-a la base de datos MYSQL, y ``columnFamily`` es le nombre de la columna de la tabla de hbase que contiene las palabras
+a la base de datos MYSQL, y ``columnFamily`` es el nombre de la columna de la tabla de hbase que contiene las palabras
 a buscar.
 
-Una vez submiteada una topología, si se desea volverla a correr (volver a submitear una topología con el mismo nombre 
-que otra que ya se corriío/submiteó), se debe dar de baja previamente. Esto se logra corriendo
+Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo nombre) se debe dar de baja previamente la topología anterior. Esto se logra corriendo
 
 	storm kill topologyName
 
@@ -53,9 +52,19 @@ Para monitorear el funcionamiento de las colas en ActiveMQ se puede acceder a
 Para compilar el proyecto del consumidor de streams de Twitter correr dentro de la carpeta tweetsStream
 
     mvn clean package
+	
+	para que el proyecto se compile de forma correcta, en la carpeta /tweetsStream/src/main/resources debe existir el archivo oauthcredentials con el siguiente formato:
+	
+	consumerKey = xxxxxxxx
+	consumerSecret = xxxxxxx
+	accessToken = xxxxxxx
+	accessTokenSecret = xxxxxxxx
+	
+	siendo estos los datos provistos por Twitter para la autenticación mediante OAuth.
 
-Para correr el consumidor de streams de Twitter correr dentro de la carpeta tweetsStream
+Para correr el consumidor de streams de Twitter correr dentro de la carpeta tweetsStream/target
 
-    ???? <outputFolder> <terms>
+    java -jar bigdata-twitterclient-jar-with-dependencies.jar <outputFolder> <terms>
 
-    donde <outputFolder> es la carpeta en donde se crearan los archivos de salida. Esta carpeta debe existir previamente. Paralelamente <terms> es la lista de términos a buscar separados por comas (","). Un ejemplo de términos podría ser "termino1,termino2,termino de prueba".
+    donde <outputFolder> es el path relativo de la carpeta en donde se crearan los archivos de salida. Esta carpeta debe existir previamente. 
+	Paralelamente <terms> es la lista de términos a buscar separados por comas (","). Un ejemplo de términos podría ser "termino1,termino2,termino de prueba".

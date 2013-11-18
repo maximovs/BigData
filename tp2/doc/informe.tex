@@ -171,6 +171,98 @@ completo en la \textit{Streaming API} en vez de la \textit{REST API} (que es la 
 
 \section{Instrucciones para ejecutar la métrica}
 
+El proyecto cuenta con 3 partes que deben ejecutarse de manera paralela.
+Se considera para la compilación de las 3 partes, que \textit{Maven} se encuentra instalado en el sistema.
+
+\subsection{Cliente de Twitter}
+
+\subsubsection{Compilación}
+
+Para compilar el proyecto del consumidor de streams de \textit{Twitter} correr dentro de la carpeta tweetsStream::
+
+    mvn clean package
+	
+Para que el proyecto se compile de forma correcta, en la carpeta /tweetsStream/src/main/resources debe existir el archivo oauthcredentials con el siguiente formato:
+
+consumerKey = xxxxxxxx
+consumerSecret = xxxxxxx
+accessToken = xxxxxxx
+accessTokenSecret = xxxxxxxx
+
+\subsubsection{Ejecución}
+
+Para correr el consumidor de streams de \textit{Twitter} correr dentro de la carpeta tweetsStream/target:
+
+	java -jar bigdata-twitterclient-jar-with-dependencies.jar <outputFolder> <terms>
+
+El parámetro <outputFolder> es el path relativo de la carpeta en donde se crearan los archivos de salida. Esta carpeta debe existir previamente. 
+Paralelamente <terms> es la lista de términos a buscar separados por comas (","). Un ejemplo de términos podría ser "termino1,termino2,termino de prueba".
+
+\subsection{Flume}
+
+Se requiere que \textit{Flume} se encuentre instalado y agregado a la variable de entorno PATH. 
+Esto último se puede hacer de la siguiente manera:
+
+export PATH=absolute-path/to/flumeDir/bin:$PATH
+
+Para verificar que \textit{Flume} está agregado al PATH se debería poder correr desde la consola el comando ``flume-ng`` y 
+verificar que el output es el del comando en cuestión.
+
+\subsubsection{Compilación}
+
+Para compilar el proyecto \textit{Flume} con el custom sink para activeMQ correr dentro de la carpeta flume
+
+	mvn clean package -DskipTests
+
+\subsubsection{Ejecución}
+
+Para correr el agente de \textit{Flume} correr dentro de la carpeta flume
+
+	sh run-flume.sh
+	
+La configuración del agente de \textit{Flume} se encuentra en la carpeta flume/conf.
+	
+\subsection{Storm}
+
+\subsubsection{Compilación}
+
+Para compilar el proyecto \textit{Storm} con la topología correr dentro de la carpeta storm
+
+	mvn clean package
+
+\subsubsection{Ejecución}
+
+Para correr la topología de \textit{Storm} correr dentro de la carpeta storm
+	
+	storm jar target/storm-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.itba.g2.storm.StormTopology topologyName sqlDBUrl table mainField countField user pass columnFamily
+
+Los parámetros son los siguientes:
+
+\begin{itemize}
+	\item ``topologyName`` es el nombre que se le quiere dar a la topología de storm que se correrá.
+	\item ``sqlDBUrl`` es la url de la base de datos \textit{MySQL} donde se escribirán los resultados.
+	\item ``table`` es el nombre de la tabla donde se almacenarán los resultados.
+	\item ``mainField`` es el campo de la tabla que representa el nombre de la agrupación.
+	\item ``countField`` es el campo de la tabla que representa la cantidad de menciones.
+	\item ``user`` es el usuario para acceder a la base de datos \textit{MySQL}.
+	\item ``pass`` es la usuario para acceder a la base de datos \textit{MySQL}.
+	\item ``columnFamily`` es el nombre de la columna de la tabla de \textit{HBase} que contiene las palabras a buscar.
+\end{itemize}
+
+Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo nombre) se debe dar de baja previamente la topología anterior. Esto se logra corriendo
+
+	storm kill topologyName
+
+\subsection{Consideraciones}
+
+\subsubsection{ActiveMQ}
+
+Tanto el proyecto \textit{Flume} como el de \textit{Storm} utilizan una cola de mensaje \textit{ActiveMQ}, que debe estar correctamente instalado, 
+y cuya url es uno de los parámetros para correr el proyecto de \textit{Storm}.
+
+Para monitorear el funcionamiento de las colas en ActiveMQ se puede acceder a 
+[http://hadoop-2013-datanode-2:8161/admin/queues.jsp](http://hadoop-2013-datanode-2:8161/admin/queues.jsp)
+	
 \small
 \section{Formato de los resultado de la métrica}
 
