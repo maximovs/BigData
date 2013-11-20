@@ -19,6 +19,8 @@
 \usepackage{listings}
 \usepackage{bm}
 \usepackage{times}
+\usepackage{hyperref}
+
 
 \begin{document}
 \setcounter{secnumdepth}{5}
@@ -128,6 +130,14 @@ El primer \textit{Bolt} se encuentra unido al segundo con \textit{FilterGrouping
 
 Para probar la topología se implementaron \textit{Bolts} que hacen sus tareas omitiendo las conexiones a \textit{MySQL} y \textit{HBase}.
 Habiendo corroborado su correcto funcionamiento se implementaron luego, las versiones finales y completas.
+
+Un gran problema que tuvimos, y con el cual estuvimos luchando hasta último momento, fue que, por querer mantener solo una conexión con la base de datos \textit{MYSQL} por 
+\textit{Bolt}, almacenábamos dicha conexión como una variable de instancia, con el grave error de ponerle un calificador \textit{transient}, pensando (de manera errónea) que esto
+salvaría los problemas de serialización. El error nos confundió y nos tomó bastante trabajo encontrarlo, principalmente porque al correr el sistema de forma local, todo 
+funcionaba correctamente, pero al correr en el cluster, algo claramente fallaba luego de desencolar los mensajes dado que nunca se escribían los resultados a la base de datos.
+Este error nuestro se vió magnificado por algunas de las limitaciones de storm, los archivos de logs están distribuidos en el cluster, con lo cual no podíamos fácilmente acceder
+a ellos. Además, la storm UI no siempre evidenciaba la \textit{Null Pointer Exception} que hacía que los bolts que escribían a la base datos, y por lo tanto la topología, 
+fallaran en su cometido.
 
 \subsection{Cliente de Twitter}
 
@@ -256,12 +266,14 @@ Los parámetros son los siguientes:
 
 \begin{itemize}
 	\item ``topologyName`` es el nombre que se le quiere dar a la topología de storm que se correrá.
+    \item  ``activeMQUrl`` es la url de la cola de mensajes \textit{ActiveMQ}.
 	\item ``sqlDBUrl`` es la url de la base de datos \textit{MySQL} donde se escribirán los resultados.
 	\item ``table`` es el nombre de la tabla donde se almacenarán los resultados.
 	\item ``mainField`` es el campo de la tabla que representa el nombre de la agrupación.
 	\item ``countField`` es el campo de la tabla que representa la cantidad de menciones.
 	\item ``user`` es el usuario para acceder a la base de datos \textit{MySQL}.
 	\item ``pass`` es la usuario para acceder a la base de datos \textit{MySQL}.
+    \item ``HBaseTable`` es el nombre de la tabla de \textit{HBase} las palabras a consumir.
 	\item ``columnFamily`` es el nombre de la columna de la tabla de \textit{HBase} que contiene las palabras a buscar.
 \end{itemize}
 
@@ -270,6 +282,23 @@ Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo 
 
 	storm kill topologyName
 
+En caso de que Nimbus se encuentre caído, lo cual puede percibirse desde la storm UI o por algunos errores extraños de conexión, se debe levantarlo corriendo
+\\
+
+    storm nimbus
+Adicionalmente, quizás la storm UI puede estar desactivada, para activarla basta correr
+\\
+    storm ui
+Si se encuentra bajo un proxy, como es el caso de los laboratorios de ITBA, que bloquea ciertos puertos, puede tener problemas para monitorear algunos los sistemas. 
+Esto puede solucionarse abriendo un tunel ssh al namenode.
+\\
+
+    ssh -i id\_dsa -L 9000:hadoop-2013-datanode-4:8080 hadoop@hadoop-2013-namenode
+Por último, en caso de que no haya supervisors corriendo se deben levantar de la siguiente forma corriendo en el cluster
+\\
+
+    nohup storm supervisor\&
+
 \subsection{Consideraciones}
 
 \subsubsection{ActiveMQ}
@@ -277,9 +306,13 @@ Una vez ejecutada una topología, si se desea volverla a correrla (con el mismo 
 Tanto el proyecto \textit{Flume} como el de \textit{Storm} utilizan una cola de mensaje \textit{ActiveMQ}, que debe estar correctamente instalado,
 y cuya url es uno de los parámetros para correr el proyecto de \textit{Storm}.
 
-Para monitorear el funcionamiento de las colas en ActiveMQ se puede acceder a
-[http://hadoop-2013-datanode-2:8161/admin/queues.jsp](http://hadoop-2013-datanode-2:8161/admin/queues.jsp)
+Para monitorear el funcionamiento de las colas en \textit{ActiveMQ} se puede acceder a
+\href{http://hadoop-2013-datanode-7:8161/admin/queues.jsp}{http://hadoop-2013-datanode-7:8161/admin/queues.jsp}
+, en donde, al tiempo de este proyecto 
+se encuentra levantaba la cola de mensajes de \textit{ActiveMQ}.
 
+Para monitorear el funcionamiento de la topología de \textit{Storm}, se puede acceder a la storm ui en 
+\href{http://hadoop-2013-datanode-4:8080}{http://hadoop-2013-datanode-4:8080}.
 \small
 \section{Formato de los resultado de la métrica}
 
