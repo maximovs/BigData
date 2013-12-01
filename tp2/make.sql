@@ -5,3 +5,7 @@ CREATE TABLE `GroupsCount` (
 PRIMARY KEY (`id`),
 UNIQUE KEY `GroupId` (`GroupId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=latin1;
+
+
+CREATE USER 'barry'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON * . * TO 'barry'@'localhost';
