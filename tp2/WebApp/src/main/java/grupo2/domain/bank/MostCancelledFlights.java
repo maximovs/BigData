@@ -1,11 +1,10 @@
 	package grupo2.domain.bank;
 
-import java.util.Date;
-
-import grupo2.domain.PersistentEntity;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 
@@ -17,7 +16,7 @@ public class MostCancelledFlights {
 	@Column(name="Hurricane")
 	private String hurricane;
 	@Column(name="Date")
-	private Date time;
+	private String time;
 	@Column(name="Cancellations")
 	private int cancellations;
 
@@ -32,11 +31,11 @@ public class MostCancelledFlights {
 		this.hurricane = hurricane;
 	}
 
-	public Date getTime() {
+	public String getTime() {
 		return time;
 	}
 
-	public void setTime(Date time) {
+	public void setTime(String time) {
 		this.time = time;
 	}
 

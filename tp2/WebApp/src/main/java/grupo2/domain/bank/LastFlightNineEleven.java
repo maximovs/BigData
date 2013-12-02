@@ -1,11 +1,10 @@
 	package grupo2.domain.bank;
 
-import java.util.Date;
-
-import grupo2.domain.PersistentEntity;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 
@@ -30,11 +29,11 @@ public class LastFlightNineEleven {
 		this.origin = origin;
 	}
 
-	public Date getTime() {
+	public String getTime() {
 		return time;
 	}
 
-	public void setTime(Date time) {
+	public void setTime(String time) {
 		this.time = time;
 	}
 
