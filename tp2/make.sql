@@ -10,18 +10,13 @@ UNIQUE KEY `GroupId` (`GroupId`)
 CREATE USER 'barry'@'localhost' IDENTIFIED BY '1234';
 GRANT ALL PRIVILEGES ON * . * TO 'barry'@'localhost';
 
--- Table: datecancelled
-
--- DROP TABLE datecancelled;
-
-CREATE TABLE datecancelled
+CREATE TABLE SeptemberFlights
 (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  hurricane varchar(255) NOT NULL DEFAULT '',
-  date timestamp,
-  cancellations integer,
-PRIMARY KEY (`id`),
-) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=latin1;
+  flightDate varchar(255),
+  flights int,
+  cancellations int,
+PRIMARY KEY (flightDate)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Table: timelastflightnineeleven
 
