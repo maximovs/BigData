@@ -11,12 +11,14 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "TimeLastFlightNineEleven")
-public class LastFlightNineEleven extends PersistentEntity{
+public class LastFlightNineEleven {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="Origin")
 	private String origin;
 	@Column(name="Time")
-	private Date time;
-	
+	private String time;
+
 	LastFlightNineEleven() {
 	}
 
@@ -36,8 +38,8 @@ public class LastFlightNineEleven extends PersistentEntity{
 		this.time = time;
 	}
 
-	
 
 
-		
+
+
 }

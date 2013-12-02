@@ -26,10 +26,9 @@ PRIMARY KEY (flightDate)
 
 CREATE TABLE TimeLastFlightNineEleven
 (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   origin varchar(255) NOT NULL,
-  time timestamp,
-  PRIMARY KEY (`id`)
+  time varchar(255),
+  PRIMARY KEY (origin)
 ) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=latin1;
 
 CREATE TABLE TotalFlights
@@ -43,6 +42,7 @@ CREATE TABLE TotalFlights
 CREATE TABLE DateCancelled
 (
     Hurricane varchar(255),
-    Date timestamp,
-    Cancellations integer
+    Date varchar(255),
+    Cancellations integer,
+    PRIMARY KEY(Hurricane)
 );

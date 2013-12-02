@@ -11,14 +11,16 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "DateCancelled")
-public class MostCancelledFlights extends PersistentEntity{
+public class MostCancelledFlights {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="Hurricane")
 	private String hurricane;
 	@Column(name="Date")
 	private Date time;
 	@Column(name="Cancellations")
 	private int cancellations;
-	
+
 	MostCancelledFlights() {
 	}
 
@@ -46,5 +48,5 @@ public class MostCancelledFlights extends PersistentEntity{
 		this.cancellations = cancellations;
 	}
 
-	
+
 }
