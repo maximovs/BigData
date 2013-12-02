@@ -8,7 +8,7 @@ import java.util.List;
 public interface LastFlightNineElevenRepo {
 
 
-	public List<String> getAll();
+	public List<LastFlightNineEleven> getAll();
 
 	public LastFlightNineEleven get(String origin);
 	

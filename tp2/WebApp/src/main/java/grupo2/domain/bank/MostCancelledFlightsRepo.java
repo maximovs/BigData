@@ -8,7 +8,7 @@ import java.util.List;
 public interface MostCancelledFlightsRepo {
 
 
-	public List<String> getAll();
+	public List<MostCancelledFlights> getAll();
 
 	public MostCancelledFlights get(String origin);
 	

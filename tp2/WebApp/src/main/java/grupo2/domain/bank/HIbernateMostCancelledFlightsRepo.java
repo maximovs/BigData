@@ -18,7 +18,7 @@ public class HIbernateMostCancelledFlightsRepo extends AbstractHibernateRepo imp
 	}
 
 	@Override
-	public List<String> getAll() {
+	public List<MostCancelledFlights> getAll() {
 		return this.find("from MostCancelledFlights");
 	}
 

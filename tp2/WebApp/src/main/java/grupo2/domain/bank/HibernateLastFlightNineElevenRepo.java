@@ -18,7 +18,7 @@ public class HibernateLastFlightNineElevenRepo extends AbstractHibernateRepo imp
 	}
 
 	@Override
-	public List<String> getAll() {
+	public List<LastFlightNineEleven> getAll() {
 		return this.find("from LastFlightNineEleven");
 	}
 
