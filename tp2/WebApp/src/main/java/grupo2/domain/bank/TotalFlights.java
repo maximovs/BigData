@@ -1,9 +1,5 @@
 	package grupo2.domain.bank;
 
-import java.util.Date;
-
-import grupo2.domain.PersistentEntity;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
