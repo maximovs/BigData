@@ -32,3 +32,11 @@ CREATE TABLE timelastflightnineeleven
   PRIMARY KEY (`id`),
 ) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=latin1;
 
+CREATE TABLE totalflights
+(
+  date varchar(255) NOT NULL,
+  total integer,
+  cancelled integer,
+  PRIMARY KEY (date)
+)
+
