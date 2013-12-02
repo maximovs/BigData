@@ -1,1 +1,0 @@
-sqoop-export --connect jdbc:mysql://hadoop-2013-datanode-6/itba_barry --username barry -password 1234 --table SeptemberFlights --export-dir output0245/metric10test --update-key flightDate --update-mode allowinsert --input-fields-terminated-by '\040'

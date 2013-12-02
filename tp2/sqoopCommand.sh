@@ -1,0 +1,1 @@
+sqoop-export --connect jdbc:mysql://hadoop-2013-datanode-6/itba_barry --username barry --password 1234 --table SeptemberFlights --export-dir ITBA/TP1/OUTPUT10/ej10/part-r-00000 --update-key flightDate --update-mode allowinsert --input-fields-terminated-by '\054'
