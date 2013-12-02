@@ -10,6 +10,8 @@ UNIQUE KEY `GroupId` (`GroupId`)
 CREATE USER 'barry'@'localhost' IDENTIFIED BY '1234';
 GRANT ALL PRIVILEGES ON * . * TO 'barry'@'localhost';
 
+-- Metric 10 table
+
 CREATE TABLE SeptemberFlights
 (
   flightDate varchar(255),
