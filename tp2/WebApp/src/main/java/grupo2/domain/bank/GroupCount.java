@@ -14,7 +14,7 @@ public class GroupCount extends PersistentEntity {
 	private String groupId;
 	@Column(name="Ammount")
 	private int ammount;
-	
+
 	GroupCount() {
 	}
 
@@ -35,5 +35,5 @@ public class GroupCount extends PersistentEntity {
 	}
 
 
-		
+
 }
